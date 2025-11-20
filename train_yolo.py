@@ -26,7 +26,7 @@ try:
 except ImportError:
     sys.exit("❌ pip install ultralytics required")
 
-from configs.model_configs import MODEL_CONFIGS
+from .configs.model_configs import MODEL_CONFIGS
 
 
 def train_yolo(args):

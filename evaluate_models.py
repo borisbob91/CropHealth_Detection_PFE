@@ -21,14 +21,14 @@ from torch.utils.data import DataLoader
 from torchmetrics.detection.mean_ap import MeanAveragePrecision
 from sklearn.metrics import precision_recall_curve, auc
 
-from configs.model_configs import MODEL_CONFIGS, NUM_CLASSES
-from datasets.yolo_dataset import YoloDataset
-from datasets.coco_dataset import CocoDataset
-from datasets.transforms import get_albu_transform
-from models.ssd_model import build_ssd_model
-from models.effdet_model import build_efficientdet_model
-from models.frcnn_model import build_fasterrcnn_model
-from models.frcnn_light_model import build_fasterrcnn_light_model
+from .configs.model_configs import MODEL_CONFIGS, NUM_CLASSES
+from .datasets.yolo_dataset import YoloDataset
+from .datasets.coco_dataset import CocoDataset
+from .datasets.transforms import get_albu_transform
+from .models.ssd_model import build_ssd_model
+from .models.effdet_model import build_efficientdet_model
+from .models.frcnn_model import build_fasterrcnn_model
+from .models.frcnn_light_model import build_fasterrcnn_light_model
 
 def build_model(model_key, checkpoint_path, device):
     """Charge le modèle depuis checkpoint"""

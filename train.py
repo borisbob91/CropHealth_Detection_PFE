@@ -18,16 +18,16 @@ import torch
 from torch.utils.data import DataLoader
 
 # Imports locaux
-from configs.model_configs import MODEL_CONFIGS, NUM_CLASSES
-from datasets.yolo_dataset import YoloDataset
-from datasets.coco_dataset import CocoDataset
-from datasets.pascalvoc_dataset import PascalVOCDataset
-from datasets.transforms import get_albu_transform
-from models.ssd_model import build_ssd_model
-from models.effdet_model import build_efficientdet_model
-from models.frcnn_model import build_fasterrcnn_model
-from models.frcnn_light_model import build_fasterrcnn_light_model
-from trainers.base_trainer import BaseTrainer
+from .configs.model_configs import MODEL_CONFIGS, NUM_CLASSES
+from .datasets.yolo_dataset import YoloDataset
+from .datasets.coco_dataset import CocoDataset
+from .datasets.pascalvoc_dataset import PascalVOCDataset
+from .datasets.transforms import get_albu_transform
+from .models.ssd_model import build_ssd_model
+from .models.effdet_model import build_efficientdet_model
+from .models.frcnn_model import build_fasterrcnn_model
+from .models.frcnn_light_model import build_fasterrcnn_light_model
+from .trainers.base_trainer import BaseTrainer
 
 
 def collate_fn(batch):
