@@ -25,6 +25,7 @@ def build_fasterrcnn_model(num_classes: int):
     
     # Remplacer le classifieur pour num_classes
     in_features = model.roi_heads.box_predictor.cls_score.in_features
+    
     model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
     
     return model

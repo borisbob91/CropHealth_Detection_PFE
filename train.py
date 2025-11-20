@@ -18,16 +18,16 @@ import torch
 from torch.utils.data import DataLoader
 
 # Imports locaux
-from .configs.model_configs import MODEL_CONFIGS, NUM_CLASSES
-from .datasets.yolo_dataset import YoloDataset
-from .datasets.coco_dataset import CocoDataset
-from .datasets.pascalvoc_dataset import PascalVOCDataset
-from .datasets.transforms import get_albu_transform
-from .models.ssd_model import build_ssd_model
-from .models.effdet_model import build_efficientdet_model
-from .models.frcnn_model import build_fasterrcnn_model
-from .models.frcnn_light_model import build_fasterrcnn_light_model
-from .trainers.base_trainer import BaseTrainer
+from configs.model_configs import MODEL_CONFIGS, NUM_CLASSES
+from datasets.yolo_dataset import YoloDataset
+from datasets.coco_dataset import CocoDataset
+from datasets.pascalvoc_dataset import PascalVOCDataset
+from datasets.transforms import get_albu_transform
+from models.ssd_model import build_ssd_model
+from models.effdet_model import build_efficientdet_model
+from models.frcnn_model import build_fasterrcnn_model
+from models.frcnn_light_model import build_fasterrcnn_light_model
+from trainers.base_trainer import BaseTrainer
 
 
 def collate_fn(batch):
@@ -95,11 +95,11 @@ def build_dataloaders(model_key, data_root, config):
         raise ValueError(f"Unknown dataset format: {dataset_format}")
     
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,
-                              num_workers=4, collate_fn=collate_fn)
-    val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False,
-                            num_workers=4, collate_fn=collate_fn)
-    test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=False,
-                             num_workers=4, collate_fn=collate_fn)
+                              num_workers=2, collate_fn=collate_fn)
+    val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=True,
+                            num_workers=2, collate_fn=collate_fn)
+    test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=True,
+                             num_workers=2, collate_fn=collate_fn)
     
     return train_loader, val_loader, test_loader
 

@@ -26,7 +26,7 @@ try:
 except ImportError:
     sys.exit("❌ pip install ultralytics required")
 
-from .configs.model_configs import MODEL_CONFIGS
+from configs.model_configs import MODEL_CONFIGS
 
 
 def train_yolo(args):
@@ -48,7 +48,7 @@ def train_yolo(args):
     print(f"{'='*60}\n")
     
     # Charger modèle pré-entraîné
-    model = YOLO('yolov8n.pt')
+    model:YOLO = YOLO('yolov8n.pt')
     
     device = 'cuda' if torch.cuda.is_available() and args.device != 'cpu' else 'cpu'
     
@@ -67,8 +67,9 @@ def train_yolo(args):
         device=args.device,
         pretrained=True,
         verbose=True,
-        cache=args.cache,
+       # cache=args.cache,
         exist_ok=True,
+        patience=5
     )
     
     # Validation finale

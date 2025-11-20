@@ -34,6 +34,7 @@ Structure Pascal VOC attendue:
 """
 import argparse
 import json
+import os
 import shutil
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -325,7 +326,7 @@ test: test/images  # optionnel
 nc: {len(class_names)}
 names: {class_names}
 """
-    
+    os.makedirs(output_root, exist_ok=True)
     yaml_path = output_root / 'data.yaml'
     with open(yaml_path, 'w') as f:
         f.write(yaml_content)

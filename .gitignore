@@ -17,3 +17,5 @@ migrate_working_dir/
 .idea/
 ../__pycache__/
 /__pycache__/
+
+yolov8n.pt

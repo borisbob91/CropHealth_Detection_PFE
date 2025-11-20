@@ -72,11 +72,11 @@ def get_transforms(dataset_type: str, bbox_format: str = 'pascal_voc') -> Dict[s
             'train': True, 'val': True, 'test': True
         },
         'scale_1': {
-            'transform': A.Compose([A.Affine(scale=0.80, p=1.0, mode=cv2.BORDER_CONSTANT)], bbox_params=bbox_params),
+            'transform': A.Compose([A.Affine(scale=0.80, p=1.0)], bbox_params=bbox_params),
             'train': True, 'val': True, 'test': True
         },
         'scale_2': {
-            'transform': A.Compose([A.Affine(scale=1.5, p=1.0, mode=cv2.BORDER_CONSTANT)], bbox_params=bbox_params),
+            'transform': A.Compose([A.Affine(scale=1.5, p=1.0)], bbox_params=bbox_params),
             'train': True, 'val': True, 'test': True
         },
         'gamma_1': {

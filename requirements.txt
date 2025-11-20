@@ -8,53 +8,45 @@ tqdm
 # ============================================
 
 # ---------- Core Deep Learning ----------
-torch>=2.0.0
-torchvision>=0.15.0
-torchmetrics>=1.0.0
+torch
+torchvision
+torchmetrics
 
 # ---------- Object Detection Frameworks ----------
 # YOLOv8n (Ultralytics)
-ultralytics>=8.0.0
+ultralytics
 
 # EfficientDet-D0 (timm + effdet)
-timm>=0.9.0
-effdet>=0.4.0
+timm
+effdet
 
 # ---------- Data Augmentation ----------
-albumentations>=1.3.0
-opencv-python>=4.8.0
+albumentations
+opencv-python
 
 # ---------- Evaluation Metrics ----------
 # COCO Evaluator
-pycocotools>=2.0.7
+pycocotools
 
 # Classification metrics
-scikit-learn>=1.3.0
+scikit-learn
 
 # ---------- Visualization ----------
-matplotlib>=3.7.0
-seaborn>=0.12.0
-Pillow>=10.0.0
+matplotlib
+seaborn
+Pillow
 
 # ---------- Model Analysis ----------
 # GFLOPs computation
-thop>=0.1.1
+thop
 
 # Model summary
-torchinfo>=1.8.0
+torchinfo
 
 # ---------- Logging & Monitoring ----------
-tensorboard>=2.14.0
+tensorboard
 
 # ---------- Utilities ----------
-numpy>=1.24.0
-pandas>=2.0.0
-tqdm>=4.65.0
-
-# ---------- Optional: Notebook support ----------
-jupyter>=1.0.0
-ipywidgets>=8.0.0
-
-# ---------- Optional: Google Colab ----------
-# Ces packages sont pré-installés sur Colab, mais inclus pour compatibilité locale
-google-colab; sys_platform == "linux"  # Colab uniquement
+numpy
+pandas
+tqdm

@@ -53,7 +53,7 @@ MODEL_CONFIGS = {
         'name': 'CropHealth_YOLOv8n',
         'backbone': 'CSP-Darknet',
         'input_size': 640,
-        'epochs': 50,
+        'epochs': 2,
         'batch_size': 32,
         'lr': 0.01,
         'optimizer': 'SGD',
