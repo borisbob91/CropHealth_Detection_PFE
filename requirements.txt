@@ -1,0 +1,60 @@
+albumentations
+opencv-python
+tqdm
+# ============================================
+# CropHealth Detection - Dependencies
+# Projet de détection et classification d'objets agricoles
+# Compatible: Python 3.8+, CUDA 11.8+
+# ============================================
+
+# ---------- Core Deep Learning ----------
+torch>=2.0.0
+torchvision>=0.15.0
+torchmetrics>=1.0.0
+
+# ---------- Object Detection Frameworks ----------
+# YOLOv8n (Ultralytics)
+ultralytics>=8.0.0
+
+# EfficientDet-D0 (timm + effdet)
+timm>=0.9.0
+effdet>=0.4.0
+
+# ---------- Data Augmentation ----------
+albumentations>=1.3.0
+opencv-python>=4.8.0
+
+# ---------- Evaluation Metrics ----------
+# COCO Evaluator
+pycocotools>=2.0.7
+
+# Classification metrics
+scikit-learn>=1.3.0
+
+# ---------- Visualization ----------
+matplotlib>=3.7.0
+seaborn>=0.12.0
+Pillow>=10.0.0
+
+# ---------- Model Analysis ----------
+# GFLOPs computation
+thop>=0.1.1
+
+# Model summary
+torchinfo>=1.8.0
+
+# ---------- Logging & Monitoring ----------
+tensorboard>=2.14.0
+
+# ---------- Utilities ----------
+numpy>=1.24.0
+pandas>=2.0.0
+tqdm>=4.65.0
+
+# ---------- Optional: Notebook support ----------
+jupyter>=1.0.0
+ipywidgets>=8.0.0
+
+# ---------- Optional: Google Colab ----------
+# Ces packages sont pré-installés sur Colab, mais inclus pour compatibilité locale
+google-colab; sys_platform == "linux"  # Colab uniquement
