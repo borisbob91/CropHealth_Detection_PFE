@@ -121,13 +121,13 @@ def run(dataset: str = None, num_images: int = None):
 def _build_arg_parser():
     parser = argparse.ArgumentParser(description='Visualiser des images avec boîtes VOC (XML).')
     parser.add_argument(
-        '--dataset', '-d',
+        '-d', '--dataset',
         type=str,
         default=default_dataset,
         help=r"Chemin du dossier (contenant images/ et Annotations/)"
     )
     parser.add_argument(
-        '--num_images', '-n',
+        '-n', '--num_images',
         type=int,
         default=default_num_samples,
         help="Nombre d'images aléatoires à visualiser (défaut: 6)"

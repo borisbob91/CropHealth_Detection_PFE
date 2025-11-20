@@ -75,7 +75,7 @@ def resize_image_and_voc_annotation(image_path, xml_path, output_image_path, out
 
 if __name__ == "__main__":
     # Configuration
-    root_dir = r'C:\Users\BorisBob\Desktop\detection\dataset_split\label_studio\train'
+    root_dir = r'C:\Users\BorisBob\Desktop\detection\dataset_split\label_studio\pascal_voc_data\train'
     images_dir = os.path.join(root_dir, 'images')
     labels_dir = os.path.join(root_dir, 'Annotations')
     

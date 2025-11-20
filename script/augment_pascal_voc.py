@@ -17,14 +17,15 @@ from tqdm import tqdm
 AUGMENTATION_COUNTS = {
     'low': 18,    # Classes rares → max de diversité
     'medium': 12, # Classes modérées → équilibre
-    'high': 6    # Classes fréquentes → minimum suffisant
+    'high': 5    # Classes fréquentes → minimum suffisant
 }
 
 # Seuils de classification des classes
 CLASS_THRESHOLDS = {
-    'low': 80,
-    'medium': 190
+    'low': 90,
+    'medium': 200
 }
+
 
 # ============= TRANSFORMATIONS =============
 
@@ -76,7 +77,7 @@ def get_transforms(dataset_type: str, bbox_format: str = 'pascal_voc') -> Dict[s
         },
         'scale_2': {
             'transform': A.Compose([A.Affine(scale=1.5, p=1.0, mode=cv2.BORDER_CONSTANT)], bbox_params=bbox_params),
-            'train': True, 'val': False, 'test': True
+            'train': True, 'val': True, 'test': True
         },
         'gamma_1': {
             'transform': A.Compose([A.RandomGamma(gamma_limit=(80, 120), p=1.0)], bbox_params=bbox_params),
@@ -143,6 +144,25 @@ class PascalVOCAugmenter:
         # Statistiques
         self.stats_before = {}
         self.stats_after = {}
+        self.init_balance()
+    
+    def init_balance(self):
+        print("checking dataset type for balancing...")
+        if self.dataset_type in ['test', 'val']:
+            global AUGMENTATION_COUNTS
+            global CLASS_THRESHOLDS
+
+            AUGMENTATION_COUNTS = {
+                'low': 11,    # Classes rares → max de diversité
+                'medium': 6, # Classes modérées → équilibre
+                'high': 3    # Classes fréquentes → minimum suffisant
+            }
+
+            # Seuils de classification des classes
+            CLASS_THRESHOLDS = {
+                'low': 10,
+                'medium': 20
+            }
     
     def auto_detect_patterns(self, filenames: List[str]) -> Dict[str, str]:
         """Détecte les classes depuis les noms de fichiers"""
@@ -521,16 +541,15 @@ Exemples d'utilisation:
     )
     
     parser.add_argument(
-        '--input', '-i',
+        '-i', '--input',
         type=str,
-        default=r'C:\Users\BorisBob\Desktop\collecte\test\project-3-at-2025-11-14-17-04-4ff9840d',
+        required=True,
         help='Dossier d\'entrée contenant images/ et labels/ (défaut: chemin Windows)'
     )
     
     parser.add_argument(
-        '--output', '-o',
+        '-o', '--output',
         type=str,
-        default=r'C:\Users\BorisBob\Desktop\collecte\test\project-3-at-2025-11-14-17-04-4ff9840d\augmented_pascal',
         help='Dossier de sortie pour les données augmentées (défaut: input_dir/dataset_augmented_pascal)'
     )
     
