@@ -1,5 +1,7 @@
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/borisbob91/CropHealth_Detection_PFE/blob/main/notebooks/colab_complete_workflow.ipynb)
-
+[![Open porject In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/borisbob91/CropHealth_Detection_PFE/blob/main/notebooks/complete_workflow.ipynb)
+[![Setup In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/borisbob91/CropHealth_Detection_PFE/blob/main/notebooks/setup_colab.ipynb)
+[![train models In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/borisbob91/CropHealth_Detection_PFE/blob/main/notebooks/train_model.ipynb)
+[![Evaluate In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/borisbob91/CropHealth_Detection_PFE/blob/main/notebooks/evaluation.ipynb)
 # 🌾 CropHealth Detection - Projet de Fin d'Études (PFE)
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)
@@ -356,7 +358,7 @@ Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de 
 Si vous utilisez ce travail, veuillez citer :
 
 ```bibtex
-@mastersthesis{kengne2025crophealth,
+@mastersthesis{kouacouboris2025crophealth,
   title={CropHealth Detection: Deep Learning pour la détection automatique d'insectes et maladies du coton},
   author={KOUACOU GHISLAIN BORIS, BorisBob},
   year={2025},
