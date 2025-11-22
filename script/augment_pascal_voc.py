@@ -1,4 +1,5 @@
 import os
+import random
 import re
 import cv2
 import numpy as np
@@ -15,25 +16,42 @@ from tqdm import tqdm
 
 # Nombre d'augmentations par niveau (modifiable)
 AUGMENTATION_COUNTS = {
-    'low': 18,    # Classes rares → max de diversité
-    'medium': 12, # Classes modérées → équilibre
-    'high': 5    # Classes fréquentes → minimum suffisant
+    'low': 15,    # Classes rares → max de diversité
+    'medium': 8, # Classes modérées → équilibre
+    'high': 6    # Classes fréquentes → minimum suffisant
 }
 
 # Seuils de classification des classes
 CLASS_THRESHOLDS = {
-    'low': 90,
-    'medium': 200
+    'low': 90*2,
+    'medium': 300*2
 }
 
 
 # ============= TRANSFORMATIONS =============
 
 def get_transforms(dataset_type: str, bbox_format: str = 'pascal_voc') -> Dict[str, A.Compose]:
-    """Retourne les transformations selon le dataset_type"""
-    bbox_params = A.BboxParams(format=bbox_format, label_fields=['class_labels'])
+    """
+    Retourne UNIQUEMENT les transformations activées pour le dataset_type donné.
+    
+    Args:
+        dataset_type (str): 'train', 'val' ou 'test'
+        bbox_format (str): format des bbox ('pascal_voc', 'coco', etc.)
+    
+    Returns:
+        Dict[str, A.Compose]: seulement les transformations où {dataset_type}: True
+    """
+    if dataset_type not in ['train', 'val', 'test']:
+        raise ValueError("dataset_type doit être 'train', 'val' ou 'test'")
 
-        
+    bbox_params = A.BboxParams(
+        format=bbox_format,
+        label_fields=['class_labels'],
+        min_area=10,
+        min_visibility=0.2
+    )
+
+    # === Toutes les transformations avec leur activation par split ===
     all_transforms = {
         'flip_h': {
             'transform': A.Compose([A.HorizontalFlip(p=1.0)], bbox_params=bbox_params),
@@ -43,13 +61,13 @@ def get_transforms(dataset_type: str, bbox_format: str = 'pascal_voc') -> Dict[s
             'transform': A.Compose([A.VerticalFlip(p=1.0)], bbox_params=bbox_params),
             'train': True, 'val': True, 'test': True
         },
-        'flip_hv': {
-            'transform': A.Compose([A.HorizontalFlip(p=1.0), A.VerticalFlip(p=1.0)], bbox_params=bbox_params),
+        'rot_270': {
+            'transform': A.Compose([A.Rotate(limit=(270, 270), p=1.0, border_mode=cv2.BORDER_CONSTANT)], bbox_params=bbox_params),
             'train': True, 'val': True, 'test': True
         },
-        'rot_45': {
-            'transform': A.Compose([A.Rotate(limit=(45, 45), p=1.0, border_mode=cv2.BORDER_CONSTANT)], bbox_params=bbox_params),
-            'train': True, 'val': True, 'test': True
+        'weather_rain': {
+            'transform': A.Compose([A.RandomRain(slant_range=(-10, 10), drop_length=30, p=1.0)], bbox_params=bbox_params),
+            'train': True, 'val': False, 'test': False
         },
         'rot_60': {
             'transform': A.Compose([A.Rotate(limit=(60, 60), p=1.0, border_mode=cv2.BORDER_CONSTANT)], bbox_params=bbox_params),
@@ -57,6 +75,14 @@ def get_transforms(dataset_type: str, bbox_format: str = 'pascal_voc') -> Dict[s
         },
         'rot_90': {
             'transform': A.Compose([A.Rotate(limit=(90, 90), p=1.0, border_mode=cv2.BORDER_CONSTANT)], bbox_params=bbox_params),
+            'train': True, 'val': True, 'test': True
+        },
+        'flip_hv': {
+            'transform': A.Compose([
+                A.HorizontalFlip(p=1.0),
+                A.VerticalFlip(p=1.0),
+                A.RandomCrop(width=320, height=320, p=1.0)
+            ], bbox_params=bbox_params),
             'train': True, 'val': True, 'test': True
         },
         'rot_120': {
@@ -67,32 +93,12 @@ def get_transforms(dataset_type: str, bbox_format: str = 'pascal_voc') -> Dict[s
             'transform': A.Compose([A.Rotate(limit=(180, 180), p=1.0, border_mode=cv2.BORDER_CONSTANT)], bbox_params=bbox_params),
             'train': True, 'val': True, 'test': True
         },
-        'rot_270': {
-            'transform': A.Compose([A.Rotate(limit=(270, 270), p=1.0, border_mode=cv2.BORDER_CONSTANT)], bbox_params=bbox_params),
+        'scale': {
+            'transform': A.Compose([A.Affine(scale=1.2, p=1.0)], bbox_params=bbox_params),
             'train': True, 'val': True, 'test': True
         },
-        'scale_1': {
-            'transform': A.Compose([A.Affine(scale=0.80, p=1.0)], bbox_params=bbox_params),
-            'train': True, 'val': True, 'test': True
-        },
-        'scale_2': {
-            'transform': A.Compose([A.Affine(scale=1.5, p=1.0)], bbox_params=bbox_params),
-            'train': True, 'val': True, 'test': True
-        },
-        'gamma_1': {
-            'transform': A.Compose([A.RandomGamma(gamma_limit=(80, 120), p=1.0)], bbox_params=bbox_params),
-            'train': True, 'val': False, 'test': False
-        },
-        'gamma_2': {
+        'gamma': {
             'transform': A.Compose([A.RandomGamma(gamma_limit=(150, 200), p=1.0)], bbox_params=bbox_params),
-            'train': True, 'val': False, 'test': False
-        },   
-        'weather_rain': {
-            'transform': A.Compose([A.RandomRain(slant_range=(-10, 10), drop_length=30, p=1.0)], bbox_params=bbox_params),
-            'train': True, 'val': False, 'test': False
-        },
-        'weather_fog': {
-            'transform': A.Compose([A.RandomFog(fog_coef_range=(0.3, 1), p=1.0)], bbox_params=bbox_params),
             'train': True, 'val': False, 'test': False
         },
         'color_jitter': {
@@ -101,26 +107,28 @@ def get_transforms(dataset_type: str, bbox_format: str = 'pascal_voc') -> Dict[s
             ], bbox_params=bbox_params),
             'train': True, 'val': False, 'test': False
         },
+           'weather_fog': {
+            'transform': A.Compose([A.RandomFog(fog_coef_range=(0.3, 1), p=1.0)], bbox_params=bbox_params),
+            'train': True, 'val': False, 'test': False
+        },
         'color_hue': {
             'transform': A.Compose([A.HueSaturationValue(hue_shift_limit=20, p=1.0)], bbox_params=bbox_params),
             'train': True, 'val': False, 'test': False
         },
         'color_saturation': {
-            'transform': A.Compose([A.HueSaturationValue(sat_shift_limit=(-30, 30), p=1)], bbox_params=bbox_params),
+            'transform': A.Compose([A.HueSaturationValue(sat_shift_limit=(-30, 30), p=1.0)], bbox_params=bbox_params),
             'train': True, 'val': False, 'test': False
         },
     }
-    
 
-    if dataset_type not in ['train', 'val', 'test']:
-        raise ValueError(f"dataset_type doit être 'train', 'val' ou 'test'. Reçu : {dataset_type}")
-    
-    return {
-        name: config['transform'] 
-        for name, config in all_transforms.items() 
-        if config[dataset_type]
-    }
+    # === Filtrage selon le dataset_type ===
+    filtered_transforms = {}
+    for name, config in all_transforms.items():
+        if config.get(dataset_type, False):  # si activé pour ce split
+            filtered_transforms[name] = config['transform']
 
+    print(f"→ {len(filtered_transforms)} transformations chargées pour '{dataset_type}'")
+    return filtered_transforms
 # ============= CLASSE PRINCIPALE =============
 
 class PascalVOCAugmenter:
@@ -153,14 +161,14 @@ class PascalVOCAugmenter:
             global CLASS_THRESHOLDS
 
             AUGMENTATION_COUNTS = {
-                'low': 11,    # Classes rares → max de diversité
-                'medium': 6, # Classes modérées → équilibre
+                'low': 7,    # Classes rares → max de diversité
+                'medium': 4, # Classes modérées → équilibre
                 'high': 3    # Classes fréquentes → minimum suffisant
             }
 
             # Seuils de classification des classes
             CLASS_THRESHOLDS = {
-                'low': 10,
+                'low': 60,
                 'medium': 20
             }
     
@@ -394,9 +402,15 @@ class PascalVOCAugmenter:
             )
             augmented_counter[img_class] += 1
             
+            # si data set est de type test ou val, on recupere tout ce qui est 
+            if self.dataset_type in ['test', 'val']:
+                pass
             # Appliquer transformations (limiter selon équilibrage)
-            transform_names = list(self.transforms.keys())[:num_augmentations]
-            
+            # transform_names = list(self.transforms.keys())[:num_augmentations]
+            transform_names = list(self.transforms.keys())
+            random.shuffle(transform_names)
+            transform_names = random.sample(transform_names, k=num_augmentations)
+
             for aug_name in transform_names:
                 transform = self.transforms[aug_name]
                 
@@ -554,7 +568,7 @@ Exemples d'utilisation:
     )
     
     parser.add_argument(
-        '--dataset_type', '-d',
+        '-d', '--dataset_type', 
         type=str,
         choices=['train', 'val', 'test'],
         default='train',
@@ -562,7 +576,7 @@ Exemples d'utilisation:
     )
     
     parser.add_argument(
-        '--balance', '-b',
+        '-b', '--balance', 
         dest='balance',
         type=lambda x: str(x).lower() == 'true',
         default=True,

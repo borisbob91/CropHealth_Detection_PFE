@@ -19,3 +19,5 @@ migrate_working_dir/
 /__pycache__/
 
 yolov8n.pt
+
+/run/

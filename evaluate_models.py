@@ -21,9 +21,12 @@ from torch.utils.data import DataLoader
 from torchmetrics.detection.mean_ap import MeanAveragePrecision
 from sklearn.metrics import precision_recall_curve, auc
 
-from .configs.model_configs import MODEL_CONFIGS, NUM_CLASSES
-from .datasets.yolo_dataset import YoloDataset
-from .datasets.coco_dataset import CocoDataset
+from configs.model_configs import MODEL_CONFIGS, NUM_CLASSES
+from datasets.yolo_dataset import YoloDataset
+from datasets.coco_dataset import CocoDataset
+from datasets.pascalvoc_dataset import PascalVOCDataset
+from train import build_dataloaders
+
 from .datasets.transforms import get_albu_transform
 from .models.ssd_model import build_ssd_model
 from .models.effdet_model import build_efficientdet_model
@@ -596,21 +599,7 @@ def evaluate_single_model(model_key, checkpoint_path, val_data, device, class_na
     model = build_model(model_key, checkpoint_path, device)
     config = MODEL_CONFIGS.get(model_key, {'dataset_format': 'yolo'})
     
-    # DataLoader
-    if config['dataset_format'] == 'yolo' or model_key == 'yolov8n':
-        val_imgs = str(Path(val_data) / 'val' / 'images')
-        val_lbls = str(Path(val_data) / 'val' / 'labels')
-        val_ds = YoloDataset(val_imgs, val_lbls, 
-                             get_albu_transform('ssd', train=False))  # Use ssd transform as default
-    else:
-        val_json = str(Path(val_data) / 'val' / 'annotations.json')
-        val_imgs = str(Path(val_data) / 'val' / 'images')
-        val_ds = CocoDataset(val_json, val_imgs, 
-                             get_albu_transform('efficientdet', train=False))
-    
-    val_loader = DataLoader(val_ds, batch_size=4, shuffle=False, 
-                            num_workers=4, collate_fn=lambda x: tuple(zip(*x)))
-    
+    train_loader, val_loader, test_loader = build_dataloaders(model_key,Path(val_data) )
     # Inférence
     print("Running inference...")
     all_preds = []

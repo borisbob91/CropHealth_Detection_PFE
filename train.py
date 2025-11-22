@@ -34,6 +34,25 @@ def collate_fn(batch):
     """Custom collate pour detection (images de tailles différentes)"""
     return tuple(zip(*batch))
 
+def build_model(model_key, device):
+    """Construit modèle"""
+    # Build model
+    if model_key == 'ssd':
+        model = build_ssd_model(NUM_CLASSES)
+        
+    elif model_key == 'efficientdet':
+        model = build_efficientdet_model(NUM_CLASSES)
+    elif model_key == 'fasterrcnn':
+        model = build_fasterrcnn_model(NUM_CLASSES)
+    elif model_key == 'fasterrcnn_light':
+        model = build_fasterrcnn_light_model(NUM_CLASSES)
+    elif model_key in ['yolov8n', 'yolov11n']:
+        pass
+    else:
+        raise ValueError(f"Unknown model: {model_key}")
+    
+    model
+
 
 def build_dataloaders(model_key, data_root, config):
     """Construit train/val dataloaders selon format dataset"""
@@ -165,7 +184,7 @@ def main(args):
     device = torch.device(args.device)
     
     # Dataloaders
-    train_loader, val_loader = build_dataloaders(args.model, args.data, config)
+    train_loader, val_loader, test_loader = build_dataloaders(args.model, args.data, config)
     
     # Model + Optimizer + Scheduler
     model, optimizer, scheduler = build_model_optimizer_scheduler(

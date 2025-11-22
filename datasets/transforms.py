@@ -5,6 +5,9 @@ YOLOv8n utilise les augmentations natives d'Ultralytics
 """
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
+import torch
+import warnings
+from typing import List, Dict, Optional, Tuple
 
 
 def get_albu_transform(model_name: str, train: bool = True, input_size:int=None):
@@ -46,3 +49,49 @@ def get_albu_transform(model_name: str, train: bool = True, input_size:int=None)
         bbox_params=A.BboxParams(format='pascal_voc', label_fields=['class_labels']),
     )
     return pipeline
+
+
+
+def validate_bbox_format(boxes: List[List[float]], img_shape: Tuple[int, int], 
+                         filename: str = "unknown") -> Optional[torch.Tensor]:
+    """
+    Valide si les boîtes sont normalisées (0-1) ou en pixels.
+    Si non normalisées, affiche un message et retourne None.
+    
+    Args:
+        boxes: Liste de boîtes [x1, y1, x2, y2]
+        img_shape: (height, width) pour vérification si nécessaire
+        filename: Nom du fichier pour le message d'erreur
+    
+    Returns:
+        Tensor des boîtes si valides, None sinon
+    """
+    if not boxes:
+        return torch.empty((0, 4), dtype=torch.float32)
+    
+    # Convertir en tensor pour vérification
+    boxes_tensor = torch.tensor(boxes, dtype=torch.float32)
+    
+    # Vérifier si les valeurs sont déjà normalisées (entre 0 et 1)
+    if boxes_tensor.max() <= 1.0:
+        # ✅ Normalisé - accepter
+        return boxes_tensor
+    
+    # Vérifier si c'est des coordonnées en pixels mais valides
+    h, w = img_shape
+    if boxes_tensor.max() <= max(h, w):
+        # ⚠️ En pixels mais valides - avertir et ignorer
+        warnings.warn(
+            f"⚠️ Boîtes en PIXELS détectées dans {filename}: "
+            f"max={boxes_tensor.max()} > 1.0. "
+            f"Ignorées. Normalisez vos annotations (x/W, y/H)."
+        )
+        return None
+    
+    # ❌ Valeurs invalides (trop grandes ou négatives)
+    warnings.warn(
+        f"❌ Boîtes INVALIDES détectées dans {filename}: "
+        f"max={boxes_tensor.max()}, min={boxes_tensor.min()}. "
+        f"Ignorées."
+    )
+    return None

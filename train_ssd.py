@@ -2,6 +2,8 @@
 CropHealth Detection - Entraînement SSD MobileNetV3
 Script complet avec early stopping, augmentation et sauvegarde
 """
+from datetime import datetime
+import os
 import torch
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
@@ -10,18 +12,23 @@ from tqdm.auto import tqdm
 from pathlib import Path
 import numpy as np
 import yaml
+from torchmetrics.detection import MeanAveragePrecision
 
-
+from datasets.pascal_voc_clean import PascalVOCDataset2, collate_fn_filter_empty
 from datasets.pascalvoc_dataset import PascalVOCDataset
 from models.ssd_model import build_ssd_model 
 from configs.model_configs import CLASS_NAMES, NUM_CLASSES
+
+timestamp = datetime.now().strftime('%m%d_%H%M')
+save_dir = f"runs/{config['name']}_{timestamp}"
+os.makedirs(save_dir, exist_ok=True)
 
 # 2️⃣ CONFIGURATION
 def get_config():
     """Configuration de l'entraînement SSD"""
     return {
         # Chemins
-        'data_root': Path('data/crophealth'),
+        'data_root': Path(r'C:\Users\BorisBob\Desktop\detection\dataset_split\label_studio\pascal_voc_ac'),
         'train_dir': 'train',
         'val_dir': 'val',
         'test_dir': 'test',
@@ -42,7 +49,7 @@ def get_config():
         'image_size': 320,  # Taille SSD
         
         # Sauvegarde
-        'save_dir': Path('outputs/ssd_mobilenetv3'),
+        'save_dir': Path(f"outputs/ssd_mobilenetv3_{timestamp}"),
         'save_every': 5,
     }
 
@@ -117,8 +124,74 @@ class EarlyStopping:
             model.load_state_dict(self.best_weights)
         return model
 
-
+@torch.inference_mode()
 def evaluate(model, val_loader, device):
+    """
+    Validation avec mAP@50 - VERSION PROPRE
+    On utilise 2 passes : une pour loss (train), une pour mAP (eval)
+    """
+    model.eval()  # Mode évaluation pour inference
+
+    # 🔥 PASS 1: Calculer la loss en mode train mais SANS gradients
+    train_loss_epoch = 0
+    num_batches = 0
+
+    # On sauvegarde l'état original
+    was_training = model.training
+
+    model.train()  # Passer temporairement en mode train
+    with torch.no_grad():  # Mais SANS calculer les gradients
+        for imgs, targets in val_loader:
+            imgs = [img.to(device) for img in imgs]
+            targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
+
+            loss_dict = model(imgs, targets)
+            losses = sum(loss for loss in loss_dict.values())
+            train_loss_epoch += losses.item()
+            num_batches += 1
+
+    val_loss = train_loss_epoch / num_batches if num_batches > 0 else 0.0
+
+    # 🔥 PASS 2: Calculer mAP en mode eval
+    model.eval()  # Revenir en mode eval pour inference
+    metric = MeanAveragePrecision(iou_type='bbox', box_format='xyxy')
+
+    for imgs, targets in val_loader:
+        imgs = [img.to(device) for img in imgs]
+        targets_device = [{k: v.to(device) for k, v in t.items()} for t in targets]
+
+        # Inference
+        preds = model(imgs)
+
+        # Formater pour torchmetrics
+        preds_formatted = []
+        targets_formatted = []
+
+        for pred, target in zip(preds, targets):
+            preds_formatted.append({
+                'boxes': pred['boxes'].cpu(),
+                'scores': pred['scores'].cpu(),
+                'labels': pred['labels'].cpu(),
+            })
+            targets_formatted.append({
+                'boxes': target['boxes'],
+                'labels': target['labels'],
+            })
+
+        metric.update(preds_formatted, targets_formatted)
+
+    results = metric.compute()
+    map50 = results['map_50'].item()
+    map_all = results['map'].item()
+
+    # Restaurer l'état original
+    if was_training:
+        model.train()
+
+    metric.reset()
+    return val_loss, map50, map_all
+
+def evaluateOld(model, val_loader, device):
     """Évaluation sur validation set"""
     model.eval()
     total_loss = 0
@@ -186,7 +259,7 @@ def main():
     print(f"🖥️  Device: {device}")
     
     # Nombre de classes
-    num_classes = Nu
+    num_classes = NUM_CLASSES
     print(f"📦 Nombre de classes: {num_classes} (incl. background)")
     
     # Modèle
@@ -196,17 +269,17 @@ def main():
     
     # Datasets
     print("📂 Préparation des datasets...")
-    train_dataset = PascalVOCDataset(
+    train_dataset = PascalVOCDataset2(
         img_root=config['data_root'] / config['train_dir'] / 'images',
         ann_root=config['data_root'] / config['train_dir'] / 'Annotations',
-        class_names=config['class_names'],
+        class_names=CLASS_NAMES,
         transforms=get_transforms(train=True, image_size=config['image_size'])
     )
     
-    val_dataset = PascalVOCDataset(
+    val_dataset = PascalVOCDataset2(
         img_root=config['data_root'] / config['val_dir'] / 'images',
         ann_root=config['data_root'] / config['val_dir'] / 'Annotations',
-        class_names=config['class_names'],
+        class_names=CLASS_NAMES,
         transforms=get_transforms(train=False, image_size=config['image_size'])
     )
     
@@ -216,7 +289,7 @@ def main():
         batch_size=config['batch_size'],
         shuffle=True,
         num_workers=2,
-        collate_fn=collate_fn,
+        collate_fn=collate_fn_filter_empty,
         pin_memory=True if device.type == 'cuda' else False
     )
     
@@ -254,8 +327,9 @@ def main():
     )
     
     # Historique
-    history = {'train_loss': [], 'val_loss': []}
+    history = {'train_loss': [], 'val_loss': [], 'map50': [], 'map': []}
     best_val_loss = float('inf')
+    best_metric = 0.0
     
     # Boucle d'entraînement
     print("🚀 Début de l'entraînement SSD...")
@@ -266,18 +340,34 @@ def main():
         train_loss = train_one_epoch(model, train_loader, optimizer, device, epoch)
         
         # Validation
-        val_loss = evaluate(model, val_loader, device)
-        
+        # val_loss = evaluate(model, val_loader, device)
+        val_loss, map50, map_all = evaluate(model, val_loader, device)
         # Scheduler
         scheduler.step()
         
         # Historique
         history['train_loss'].append(train_loss)
         history['val_loss'].append(val_loss)
+        history['map50'].append(map50)
+        history['map'].append(map_all)
         
         print(f"\n📈 Epoch {epoch}: Train Loss={train_loss:.4f} | Val Loss={val_loss:.4f}")
+        print(f"🎯 mAP@50: {map50:.3f} | mAP: {map_all:.3f}")
         print(f"📊 LR: {optimizer.param_groups[0]['lr']:.6f} | ES Counter: {early_stopping.counter}/{early_stopping.patience}")
         
+        if map50 > best_metric:
+            best_metric = map50
+            best_path = config['save_dir'] / 'best_model.pth'
+            torch.save({
+                'epoch': epoch,
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'val_loss': val_loss,
+                'map50': map50,
+                'map': map_all,
+                'class_names': CLASS_NAMES
+            }, best_path)
+            print(f"💾 Meilleur modèle sauvegardé avec mAP@50:{map50:.3f}, chemin: {best_path}")
         # Sauvegarde meilleur modèle
         if val_loss < best_val_loss:
             best_val_loss = val_loss
@@ -287,9 +377,9 @@ def main():
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'val_loss': val_loss,
-                'class_names': config['class_names']
+                'class_names': CLASS_NAMES
             }, best_path)
-            print(f"💾 Meilleur modèle sauvegardé: {best_path}")
+            print(f"💾 Meilleur modèle sauvegardé par val loss: {best_path}")
         
         # Sauvegarde périodique
         if epoch % config['save_every'] == 0:
@@ -300,7 +390,7 @@ def main():
                 'optimizer_state_dict': optimizer.state_dict(),
                 'train_loss': train_loss,
                 'val_loss': val_loss,
-                'class_names': config['class_names']
+                'class_names': CLASS_NAMES
             }, checkpoint_path)
         
         # Early stopping

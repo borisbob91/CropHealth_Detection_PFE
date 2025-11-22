@@ -3,12 +3,15 @@ CropHealth Detection - Pascal VOC Dataset
 Charge directement les annotations Pascal VOC XML (sans conversion)
 Utilisé par: SSD, Faster R-CNN, Faster R-CNN light
 """
+import warnings
 import numpy as np
 import torch
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from PIL import Image
 from torch.utils.data import Dataset
+
+from datasets.transforms import validate_bbox_format
 
 
 class PascalVOCDataset(Dataset):
@@ -68,7 +71,15 @@ class PascalVOCDataset(Dataset):
             
             boxes.append(obj['bbox'])
             labels.append(self.class_to_idx[class_name])
+        filename = annotation['filename']
+        img_shape = img.shape[1:]  # (H, W)
         
+        validated_boxes = validate_bbox_format(boxes, img_shape, filename)
+        
+        if validated_boxes is None:
+            # ❌ Boîtes invalides - retourner image vide
+            warnings.warn(f"Image {filename} ignorée car boîtes non normalisées")
+            return self._get_empty_sample(img_shape)
         # Gestion images sans annotations valides
         if len(boxes) == 0:
             boxes = [[0, 0, 1, 1]]
@@ -127,3 +138,18 @@ class PascalVOCDataset(Dataset):
     def get_class_names(self):
         """Retourne les noms de classes"""
         return self.class_names
+    
+    def _get_empty_sample(self, img_shape):
+        """Retourne un échantillon vide pour les cas invalides"""
+        h, w = img_shape
+        
+        # Boîte factice
+        boxes = torch.zeros((0, 4), dtype=torch.float32)
+        labels = torch.zeros(0, dtype=torch.int64)
+        
+        target = {'boxes': boxes, 'labels': labels}
+        
+        # Image vide (noire)
+        img = torch.zeros((3, h, w), dtype=torch.float32)
+        
+        return img, target

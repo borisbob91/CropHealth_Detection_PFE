@@ -50,3 +50,12 @@ tensorboard
 numpy
 pandas
 tqdm
+
+tensorflow
+keras-cv
+
+scikit-learn
+pycocotools 
+seaborn  
+
+torchmetrics  # Fallback automatique
