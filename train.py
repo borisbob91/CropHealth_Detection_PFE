@@ -30,9 +30,32 @@ from models.frcnn_light_model import build_fasterrcnn_light_model
 from trainers.base_trainer import BaseTrainer
 
 
-def collate_fn(batch):
+def collate_fn_old(batch):
     """Custom collate pour detection (images de tailles différentes)"""
     return tuple(zip(*batch))
+
+def collate_fn(batch):
+    """
+    Collate function qui FILTRE les images sans annotations valides
+    Utiliser avec: DataLoader(..., collate_fn=collate_fn_filter_empty)
+    """
+    # Filtrer les samples avec seulement des boxes background (label 0)
+    filtered_batch = []
+    for img, target in batch:
+        # Garder seulement si au moins une box non-background
+        if len(target['labels']) > 0 and (target['labels'] > 0).any():
+            filtered_batch.append((img, target))
+    
+    # Si tout a été filtré, garder au moins un sample pour éviter les erreurs
+    if len(filtered_batch) == 0:
+        filtered_batch = [batch[0]]
+    
+    # Séparer images et targets
+    images = [item[0] for item in filtered_batch]
+    targets = [item[1] for item in filtered_batch]
+    
+    return images, targets
+
 
 def build_model(model_key, device):
     """Construit modèle"""
@@ -59,7 +82,8 @@ def build_dataloaders(model_key, data_root, config):
     dataset_format = config['dataset_format']
     input_size = config['input_size']
     batch_size = config['batch_size']
-    
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
     if dataset_format == 'yolo':
         # YOLO txt format
         train_imgs = str(Path(data_root) / 'train' / 'images')
@@ -114,12 +138,14 @@ def build_dataloaders(model_key, data_root, config):
         raise ValueError(f"Unknown dataset format: {dataset_format}")
     
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,
-                              num_workers=2, collate_fn=collate_fn)
+                              num_workers=2, collate_fn=collate_fn, pin_memory=True if device.type == 'cuda' else False)
     val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=True,
-                            num_workers=2, collate_fn=collate_fn)
+                            num_workers=2, collate_fn=collate_fn, pin_memory=True if device.type == 'cuda' else False)
     test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=True,
-                             num_workers=2, collate_fn=collate_fn)
+                             num_workers=2, collate_fn=collate_fn, pin_memory=True if device.type == 'cuda' else False)
     
+    print(f"📊 Train: {len(train_ds)} images | Val: {len(val_ds)} images | Test: {len(test_ds)}")
+
     return train_loader, val_loader, test_loader
 
 

@@ -8,16 +8,19 @@ import torch
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
 from torch.utils.data import DataLoader
+import torchmetrics
 from tqdm.auto import tqdm
 from pathlib import Path
 import numpy as np
 import yaml
-from torchmetrics.detection import MeanAveragePrecision
-
-from datasets.pascal_voc_clean import PascalVOCDataset2, collate_fn_filter_empty
+from torchmetrics.detection.mean_ap import MeanAveragePrecision
 from datasets.pascalvoc_dataset import PascalVOCDataset
+from datasets.transforms import get_albu_transform
+from datasets.yolo_dataset import YoloDataset
+from early_stopping import EarlyStopping
 from models.ssd_model import build_ssd_model 
 from configs.model_configs import CLASS_NAMES, NUM_CLASSES
+from train import build_dataloaders
 
 timestamp = datetime.now().strftime('%m%d_%H%M')
 # save_dir = f"runs/{config['name']}_{timestamp}"
@@ -28,7 +31,7 @@ def get_config():
     """Configuration de l'entraînement SSD"""
     return {
         # Chemins
-        'data_root': Path(r'C:\Users\BorisBob\Desktop\detection\dataset_split\label_studio\pascal_voc\resized_ultimatex4'),
+        'data_root': Path(r'C:\Users\BorisBob\Desktop\detection\dataset_split\label_studio\pascal_voc\cotton_crop_dataset_ac_augmented\cotton_crop_yolo_augmented'),
         'train_dir': 'train',
         'val_dir': 'val',
         'test_dir': 'test',
@@ -47,23 +50,23 @@ def get_config():
         
         # Transformations
         'image_size': 320,  # Taille SSD
-        
+        'name': 'CropHealth_SSD',
+        'backbone': 'MobileNetV3',
+        'input_size': 320,
         # Sauvegarde
-        'save_dir': Path(f"outputs/ssd_mobilenetv3_{timestamp}"),
+        'save_dir': Path(f"runs/ssd_mobilenetv3_{timestamp}"),
         'save_every': 5,
+        'dataset_format': 'yolo',
     }
 
 
 # 3️⃣ TRANSFORMATIONS
 def get_transforms(train=True, image_size=320):
-    """Pipeline pour SSD (320x320)"""
+    """Pipeline"""
     if train:
         transform = A.Compose([
             A.Resize(height=image_size, width=image_size),
-            A.HorizontalFlip(p=0.5),
-            A.RandomBrightnessContrast(p=0.3),
-            A.HueSaturationValue(p=0.3),
-            A.GaussNoise(p=0.1),
+            A.RandomBrightnessContrast(p=0.3),       
             A.Normalize(mean=[0.485, 0.456, 0.406],
                        std=[0.229, 0.224, 0.225]),
             ToTensorV2()
@@ -87,43 +90,6 @@ def get_transforms(train=True, image_size=320):
     return transform
 
 
-# 4️⃣ COLLATE FUNCTION
-def collate_fn(batch):
-    """Empile les batchs SSD"""
-    images, targets = zip(*batch)
-    images = list(images)
-    targets = list(targets)
-    return images, targets
-
-
-class EarlyStopping:
-    """Classe de gestion de l'early stopping"""
-    def __init__(self, patience=10, min_delta=0.001, restore_best_weights=True):
-        self.patience = patience
-        self.min_delta = min_delta
-        self.restore_best_weights = restore_best_weights
-        self.best_loss = float('inf')
-        self.counter = 0
-        self.best_weights = None
-        self.should_stop = False
-    
-    def __call__(self, val_loss, model):
-        if val_loss < self.best_loss - self.min_delta:
-            self.best_loss = val_loss
-            self.counter = 0
-            if self.restore_best_weights:
-                self.best_weights = {k: v.clone() for k, v in model.state_dict().items()}
-        else:
-            self.counter += 1
-            if self.counter >= self.patience:
-                self.should_stop = True
-    
-    def restore_best(self, model):
-        """Restaure les meilleurs poids"""
-        if self.best_weights is not None:
-            model.load_state_dict(self.best_weights)
-        return model
-
 @torch.inference_mode()
 def evaluate(model, val_loader, device):
     """
@@ -132,7 +98,7 @@ def evaluate(model, val_loader, device):
     """
     model.eval()  # Mode évaluation pour inference
 
-    # 🔥 PASS 1: Calculer la loss en mode train mais SANS gradients
+    # PASS 1: Calculer la loss en mode train mais SANS gradients
     train_loss_epoch = 0
     num_batches = 0
 
@@ -152,7 +118,7 @@ def evaluate(model, val_loader, device):
 
     val_loss = train_loss_epoch / num_batches if num_batches > 0 else 0.0
 
-    # 🔥 PASS 2: Calculer mAP en mode eval
+    # PASS 2: Calculer mAP en mode eval
     model.eval()  # Revenir en mode eval pour inference
     metric = MeanAveragePrecision(iou_type='bbox', box_format='xyxy')
 
@@ -190,25 +156,6 @@ def evaluate(model, val_loader, device):
 
     metric.reset()
     return val_loss, map50, map_all
-
-def evaluateOld(model, val_loader, device):
-    """Évaluation sur validation set"""
-    model.eval()
-    total_loss = 0
-    num_batches = 0
-    
-    with torch.no_grad():
-        for images, targets in tqdm(val_loader, desc="Validation", leave=False):
-            images = [img.to(device) for img in images]
-            targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
-            
-            loss_dict = model(images, targets)
-            losses = sum(loss for loss in loss_dict.values())
-            total_loss += losses.item()
-            num_batches += 1
-    
-    return total_loss / num_batches
-
 
 
 def train_one_epoch(model, train_loader, optimizer, device, epoch):
@@ -250,7 +197,7 @@ def main():
     """Boucle d'entraînement principale"""
     global config
     config = get_config()
-    
+
     # Créer dossier de sauvegarde
     config['save_dir'].mkdir(parents=True, exist_ok=True)
     
@@ -269,40 +216,9 @@ def main():
     
     # Datasets
     print("📂 Préparation des datasets...")
-    train_dataset = PascalVOCDataset2(
-        img_root=config['data_root'] / config['train_dir'] / 'images',
-        ann_root=config['data_root'] / config['train_dir'] / 'Annotations',
-        class_names=CLASS_NAMES,
-        transforms=get_transforms(train=True, image_size=config['image_size'])
-    )
-    
-    val_dataset = PascalVOCDataset2(
-        img_root=config['data_root'] / config['val_dir'] / 'images',
-        ann_root=config['data_root'] / config['val_dir'] / 'Annotations',
-        class_names=CLASS_NAMES,
-        transforms=get_transforms(train=False, image_size=config['image_size'])
-    )
-    
-    # DataLoaders
-    train_loader = DataLoader(
-        train_dataset,
-        batch_size=config['batch_size'],
-        shuffle=True,
-        num_workers=2,
-        collate_fn=collate_fn_filter_empty,
-        pin_memory=True if device.type == 'cuda' else False
-    )
-    
-    val_loader = DataLoader(
-        val_dataset,
-        batch_size=config['batch_size'],
-        shuffle=False,
-        num_workers=4,
-        collate_fn=collate_fn,
-        pin_memory=True if device.type == 'cuda' else False
-    )
-    
-    print(f"📊 Train: {len(train_dataset)} images | Val: {len(val_dataset)} images")
+
+    train_loader, val_loader, test_loader = build_dataloaders('ssd', config['data_root'], config)
+        
     
     # Optimiseur (SSD utilise SGD avec momentum élevé)
     optimizer = torch.optim.SGD(
@@ -368,18 +284,6 @@ def main():
                 'class_names': CLASS_NAMES
             }, best_path)
             print(f"💾 Meilleur modèle sauvegardé avec mAP@50:{map50:.3f}, chemin: {best_path}")
-        # Sauvegarde meilleur modèle
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
-            best_path = config['save_dir'] / 'best_model.pth'
-            torch.save({
-                'epoch': epoch,
-                'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
-                'val_loss': val_loss,
-                'class_names': CLASS_NAMES
-            }, best_path)
-            print(f"💾 Meilleur modèle sauvegardé par val loss: {best_path}")
         
         # Sauvegarde périodique
         if epoch % config['save_every'] == 0:
