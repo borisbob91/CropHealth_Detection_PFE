@@ -18,9 +18,11 @@ from datasets.pascalvoc_dataset import PascalVOCDataset
 from datasets.transforms import get_albu_transform
 from datasets.yolo_dataset import YoloDataset
 from early_stopping import EarlyStopping
+from metric_logger import AdvancedYoloLogger
 from models.ssd_model import build_ssd_model 
 from configs.model_configs import CLASS_NAMES, NUM_CLASSES
 from train import build_dataloaders
+from utils.yolo_style_logger import save_yolo_style_checkpoint
 
 timestamp = datetime.now().strftime('%m%d_%H%M')
 # save_dir = f"runs/{config['name']}_{timestamp}"
@@ -31,7 +33,7 @@ def get_config():
     """Configuration de l'entraînement SSD"""
     return {
         # Chemins
-        'data_root': Path(r'C:\Users\BorisBob\Desktop\detection\dataset_split\label_studio\pascal_voc\cotton_crop_dataset_ac_augmented\cotton_crop_yolo_augmented'),
+        'data_root': Path(r'C:\Users\BorisBob\Desktop\detection\pascal_test\yolo_test'),
         'train_dir': 'train',
         'val_dir': 'val',
         'test_dir': 'test',
@@ -197,7 +199,8 @@ def main():
     """Boucle d'entraînement principale"""
     global config
     config = get_config()
-
+    print(f"📋 Configuration d'entraînement SSD:\n{yaml.dump(config)}")
+  
     # Créer dossier de sauvegarde
     config['save_dir'].mkdir(parents=True, exist_ok=True)
     
@@ -205,6 +208,12 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"🖥️  Device: {device}")
     
+    logger = AdvancedYoloLogger(
+        save_dir=config['save_dir'], 
+        class_names=CLASS_NAMES, # ['healthy', 'diseased', ...] sans background si index 0 = background dans SSD
+        device=device
+    )
+
     # Nombre de classes
     num_classes = NUM_CLASSES
     print(f"📦 Nombre de classes: {num_classes} (incl. background)")
@@ -271,6 +280,14 @@ def main():
         print(f"🎯 mAP@50: {map50:.3f} | mAP: {map_all:.3f}")
         print(f"📊 LR: {optimizer.param_groups[0]['lr']:.6f} | ES Counter: {early_stopping.counter}/{early_stopping.patience}")
         
+        logger.log_epoch(epoch, {
+            'train_loss': train_loss,
+            'val_loss': val_loss,
+            'map50': map50,
+            'map': map_all,
+            'lr': optimizer.param_groups[0]['lr']
+        })
+
         if map50 > best_metric:
             best_metric = map50
             best_path = config['save_dir'] / 'best_model.pth'
@@ -284,6 +301,7 @@ def main():
                 'class_names': CLASS_NAMES
             }, best_path)
             print(f"💾 Meilleur modèle sauvegardé avec mAP@50:{map50:.3f}, chemin: {best_path}")
+            logger.generate_full_report(model, val_loader, epoch="best")
         
         # Sauvegarde périodique
         if epoch % config['save_every'] == 0:
@@ -309,7 +327,15 @@ def main():
     final_path = config['save_dir'] / 'final_model.pth'
     torch.save(model.state_dict(), final_path)
     print(f"\n✅ Entraînement terminé! Modèle final sauvegardé: {final_path}")
-
+    save_yolo_style_checkpoint(
+    model=model,
+    val_loader=val_loader,
+    epoch=epoch,
+    save_dir=config['save_dir'],
+    device=device,
+    prefix="best"  # ou f"epoch_{epoch}"
+    )
+    logger.generate_full_report(model, val_loader, epoch="FINAL")
 
 if __name__ == '__main__':
     main()
