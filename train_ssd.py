@@ -40,7 +40,7 @@ def get_config():
         
         
         # Hyperparamètres SSD
-        'num_epochs': 2,
+        'num_epochs': 100,
         'batch_size': 8,  # SSD plus léger → batch size plus grand
         'learning_rate': 0.01,  # SSD utilise typiquement un LR plus élevé
         'weight_decay': 0.0005,
