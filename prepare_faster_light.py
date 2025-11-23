@@ -19,7 +19,9 @@ from datasets.transforms import get_albu_transform
 from datasets.yolo_dataset import YoloDataset
 from early_stopping import EarlyStopping
 from metric_logger import AdvancedYoloLogger
-from models.ssd_model import build_ssd_model 
+from models.ssd_model import build_ssd_model
+from models.frcnn_light_model import build_fasterrcnn_light_model
+from models.frcnn_model import build_fasterrcnn_model
 from configs.model_configs import CLASS_NAMES, NUM_CLASSES
 from train import build_dataloaders
 from utils.yolo_style_logger import save_yolo_style_checkpoint
@@ -58,6 +60,38 @@ def get_config():
         # Sauvegarde
         'save_dir': Path(f"runs/ssd_mobilenetv3_{timestamp}"),
         'save_every': 5,
+        'dataset_format': 'yolo',
+    }
+
+def get_config():
+    """Configuration optimisée"""
+    return {
+        # Chemins
+        'data_root': Path('/content/CropHealth_Detection_PFE/data/pascal_voc_original'),
+        'train_dir': 'train',
+        'val_dir': 'val',
+        'test_dir': 'test',
+
+        # Hyperparamètres
+        'num_epochs': 30,
+        'batch_size': 6,
+        'learning_rate': 0.005,
+        'weight_decay': 0.0005,
+        'momentum': 0.9,
+
+        # Early stopping (sur mAP50 cette fois)
+        'early_stopping_patience': 8,
+        'early_stopping_metric': 'map50',  # 'loss' ou 'map50'
+        'early_stopping_mode': 'max',      # 'min' pour loss, 'max' pour mAP
+        
+        # Transformations
+        'image_size': 320,
+
+        # Sauvegarde et logging
+        'save_dir': Path('outputs/faster_rcnn_light'),
+        'save_every': 5,
+        'log_dir': Path('runs/faster_rcnn_light'),
+        'save_dir': Path(f"runs/faster_rcnn_light_{timestamp}"),
         'dataset_format': 'yolo',
     }
 
@@ -226,23 +260,23 @@ def main():
     # Datasets
     print("📂 Préparation des datasets...")
 
-    train_loader, val_loader, test_loader = build_dataloaders('ssd', config['data_root'], config)
+    train_loader, val_loader, test_loader = build_dataloaders('fasterrcnn_light', config['data_root'], config)
         
-    
-    # Optimiseur (SSD utilise SGD avec momentum élevé)
+    # Optimiseur
     optimizer = torch.optim.SGD(
         model.parameters(),
         lr=config['learning_rate'],
         momentum=config['momentum'],
         weight_decay=config['weight_decay']
     )
-    
+
     # Scheduler
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+    scheduler = torch.optim.lr_scheduler.StepLR(
         optimizer,
-        T_max=config['num_epochs'],
-        eta_min=1e-6
+        step_size=15,
+        gamma=0.1
     )
+  
     
     # Early stopping
     early_stopping = EarlyStopping(
@@ -257,7 +291,7 @@ def main():
     best_metric = 0.0
     
     # Boucle d'entraînement
-    print("🚀 Début de l'entraînement SSD...")
+    print("🚀 Début de l'entraînement Faster R-CNN (MobileNetV3)...")
     print(f"🛑 Early stopping patience: {config['early_stopping_patience']} epochs")
     
     for epoch in range(1, config['num_epochs'] + 1):

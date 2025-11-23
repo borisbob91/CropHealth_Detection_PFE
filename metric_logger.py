@@ -18,12 +18,18 @@ class AdvancedYoloLogger:
         """
         self.save_dir = Path(save_dir)
         self.save_dir.mkdir(parents=True, exist_ok=True)
-        self.class_names = class_names
+        
         # Ajout explicite de "background" pour la matrice de confusion si pas présent
         self.cm_class_names = class_names + ['background'] 
         self.device = device
         self.csv_path = self.save_dir / 'results.csv'
         self.history = []
+        # --- LIGNE DE CORRECTION CRUCIALE ---
+        # S'assure que la liste interne du logger a 'background' à l'index 0
+        if class_names and class_names[0] != 'background':
+            self.class_names = ['background'] + class_names
+        else:
+            self.class_names = class_names
         
         # Couleurs fixes
         np.random.seed(42)

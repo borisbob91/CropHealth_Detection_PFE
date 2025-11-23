@@ -28,7 +28,7 @@ def get_config():
         'weight_decay': 0.0005,
         'momentum': 0.9,
         'image_size': 800,
-        'save_dir': Path('./outputs/faster_rcnn'),
+        'save_dir': Path('./runs/faster_rcnn'),
         'save_every': 5,
     }
 

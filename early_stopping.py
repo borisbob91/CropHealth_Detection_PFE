@@ -16,10 +16,14 @@ class EarlyStopping:
             self.counter = 0
             if self.restore_best_weights:
                 self.best_weights = {k: v.clone() for k, v in model.state_dict().items()}
+               
         else:
             self.counter += 1
             if self.counter >= self.patience:
                 self.should_stop = True
+    
+    def reset_counter(self):
+        self.counter = 0
     
     def restore_best(self, model):
         """Restaure les meilleurs poids"""
