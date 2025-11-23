@@ -27,16 +27,16 @@ from datasets.coco_dataset import CocoDataset
 from datasets.pascalvoc_dataset import PascalVOCDataset
 from train import build_dataloaders
 
-from .datasets.transforms import get_albu_transform
-from .models.ssd_model import build_ssd_model
-from .models.effdet_model import build_efficientdet_model
-from .models.frcnn_model import build_fasterrcnn_model
-from .models.frcnn_light_model import build_fasterrcnn_light_model
+from datasets.transforms import get_albu_transform
+from models.ssd_model import build_ssd_model
+from models.effdet_model import build_efficientdet_model
+from models.frcnn_model import build_fasterrcnn_model
+from models.frcnn_light_model import build_fasterrcnn_light_model
 
 def build_model(model_key, checkpoint_path, device):
     """Charge le modèle depuis checkpoint"""
     # Support YOLOv8n via wrapper
-    if model_key == 'yolov8n' or model_key.contains('yolo'):
+    if model_key == 'yolov8n':
         from utils.yolo_wrapper import YOLOv8Wrapper
         model = YOLOv8Wrapper(checkpoint_path)
         model.to(device)

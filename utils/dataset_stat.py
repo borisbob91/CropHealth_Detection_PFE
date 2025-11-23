@@ -127,7 +127,7 @@ class DatasetAnalyzer:
 if __name__ == "__main__":
     analyzer = DatasetAnalyzer()
 
-    root = r"C:\Users\BorisBob\Desktop\detection\dataset_split\label_studio\pascal_voc_ac"
+    root = r"C:\Users\BorisBob\Desktop\detection\dataset_split\label_studio\pascal_voc_ac\augmented"
 
     df_img, df_inst = analyzer.analyze_full_dataset(root, "crop_health_ac")
 

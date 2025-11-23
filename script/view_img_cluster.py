@@ -134,7 +134,7 @@ def debug_clustering_on_image(image_path, xml_path, output_debug_path="debug_clu
 # ==================== UTILISATION RAPIDE ====================
 if __name__ == "__main__":
     # Change juste ces deux chemins avec une de tes images problématiques
-    image_path = r"c:\Users\BorisBob\Desktop\detection\dataset_split\label_studio\dataset_pascal_voc\train\images\fcca08ad-IMG_R_SD_432.jpg"
+    image_path = r"C:\Users\BorisBob\Desktop\detection\dataset_split\label_studio\pascal_voc\test\images\ffdb6560-IMG_R_JA_185.jpg"
     xml_path = image_path.replace("images", "Annotations").replace(".jpg", ".xml")
 
     debug_clustering_on_image(image_path, xml_path, "debug_clustering.jpg")

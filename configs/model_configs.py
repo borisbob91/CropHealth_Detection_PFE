@@ -115,3 +115,25 @@ MODEL_CONFIGS = {
         'weights': 'FasterRCNN_MobileNet_V3_Large_320_FPN_Weights.COCO_V1',
     },
 }
+
+
+CLASS_NAMES_update = [
+    'A. flava',
+    'Adulte derogata',
+    'B. tabaci',
+    'Coccinelle',
+    'Degat Jassides',
+    'Dysdercus spp',
+    'Earias spp',
+    'Effet phyto',
+    'G. spodoctera',
+    'H. amirgera',
+    'Jasside',
+    'Larve coccinelle',
+    'Larve syrphe',
+    'P. gossypiella',
+    'Puceron',
+    'S. derogata',
+    'S. frugiperda',
+    'Scarabees'
+]

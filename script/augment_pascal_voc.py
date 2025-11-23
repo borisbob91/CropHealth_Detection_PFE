@@ -69,6 +69,10 @@ def get_transforms(dataset_type: str, bbox_format: str = 'pascal_voc') -> Dict[s
             'transform': A.Compose([A.RandomRain(slant_range=(-10, 10), drop_length=30, p=1.0)], bbox_params=bbox_params),
             'train': True, 'val': False, 'test': False
         },
+          'rot_45': {
+            'transform': A.Compose([A.Rotate(limit=(45, 45), p=1.0, border_mode=cv2.BORDER_CONSTANT)], bbox_params=bbox_params),
+            'train': True, 'val': True, 'test': True
+        },
         'rot_60': {
             'transform': A.Compose([A.Rotate(limit=(60, 60), p=1.0, border_mode=cv2.BORDER_CONSTANT)], bbox_params=bbox_params),
             'train': True, 'val': True, 'test': True
@@ -125,7 +129,8 @@ def get_transforms(dataset_type: str, bbox_format: str = 'pascal_voc') -> Dict[s
     'shift_scl_rot': {
     'transform': A.Compose([A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.1, rotate_limit=15, p=1.0, border_mode=cv2.BORDER_CONSTANT)], bbox_params=bbox_params),
     'train': True, 'val': False, 'test': False
-    },'blur_gaussian': {
+    },
+    'blur_gaussian': {
         'transform': A.Compose([A.GaussianBlur(blur_limit=(3, 7), p=1.0)], bbox_params=bbox_params),
         'train': True, 'val': False, 'test': False
     },

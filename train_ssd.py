@@ -20,15 +20,15 @@ from models.ssd_model import build_ssd_model
 from configs.model_configs import CLASS_NAMES, NUM_CLASSES
 
 timestamp = datetime.now().strftime('%m%d_%H%M')
-save_dir = f"runs/{config['name']}_{timestamp}"
-os.makedirs(save_dir, exist_ok=True)
+# save_dir = f"runs/{config['name']}_{timestamp}"
+# os.makedirs(save_dir, exist_ok=True)
 
 # 2️⃣ CONFIGURATION
 def get_config():
     """Configuration de l'entraînement SSD"""
     return {
         # Chemins
-        'data_root': Path(r'C:\Users\BorisBob\Desktop\detection\dataset_split\label_studio\pascal_voc_ac'),
+        'data_root': Path(r'C:\Users\BorisBob\Desktop\detection\dataset_split\label_studio\pascal_voc\resized_ultimatex4'),
         'train_dir': 'train',
         'val_dir': 'val',
         'test_dir': 'test',
