@@ -32,16 +32,15 @@ def get_albu_transform(model_name: str, train: bool = True, input_size:int=None)
     
     # Augmentations communes (si train)
     aug = [
-        A.HorizontalFlip(p=0.5),
-        A.VerticalFlip(p=0.5),
-        A.RandomRotate90(p=0.5),
+        A.HueSaturationValue(hue_shift_limit=15, sat_shift_limit=70, val_shift_limit=40, p=0.5), 
+        A.ShiftScaleRotate(shift_limit=0.1, scale_limit=0.5, rotate_limit=0, p=0.0),
         A.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.05, p=0.8),
     ] if train else []
     
     # Pipeline finale
     pipeline = A.Compose(
         [
-            #*aug,
+            aug,
             A.Resize(size, size),
             A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
             ToTensorV2(),

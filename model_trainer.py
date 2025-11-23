@@ -18,6 +18,7 @@ from datasets.pascalvoc_dataset import PascalVOCDataset
 from datasets.yolo_dataset import YoloDataset
 from early_stopping import EarlyStopping
 from metric_logger import AdvancedYoloLogger
+from mixup import MixUpDetection
 from models.ssd_model import build_ssd_model
 from models.frcnn_model import build_fasterrcnn_model
 from models.frcnn_light_model import build_fasterrcnn_light_model
@@ -60,7 +61,7 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
             'name': 'CropHealth_SSD_SGD',
             'backbone': 'MobileNetV3',
             'num_epochs': 100,
-            'batch_size': 8,
+            'batch_size': 16,
             'learning_rate': 0.01,
             'weight_decay': 0.0005,
             'momentum': 0.9,
@@ -305,6 +306,9 @@ def get_transforms(train=True, image_size=320):
         transform = A.Compose([
             A.Resize(height=image_size, width=image_size),
             A.RandomBrightnessContrast(p=0.3),
+            A.HueSaturationValue(hue_shift_limit=15, sat_shift_limit=70, val_shift_limit=40, p=0.5), 
+       
+            A.ShiftScaleRotate(shift_limit=0.1, scale_limit=0.5, rotate_limit=0, p=0.0), # Utilisez p>0 pour rotation/scale
             A.Normalize(mean=[0.485, 0.456, 0.406],
                        std=[0.229, 0.224, 0.225]),
             ToTensorV2()
@@ -407,10 +411,11 @@ def train_one_epoch(model, train_loader, optimizer, device, epoch, config):
     model.train()
     train_loss = 0
     num_batches = 0
-    
+    mixup = MixUpDetection(alpha=1.5, prob=0.3)  # 30% de chance d'appliquer MixUp
     pbar = tqdm(train_loader, desc=f"Epoch {epoch}/{config['num_epochs']}")
     
     for images, targets in pbar:
+        images, targets = mixup(images, targets)
         images = [img.to(device) for img in images]
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
         
