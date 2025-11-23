@@ -20,4 +20,4 @@ migrate_working_dir/
 
 yolov8n.pt
 
-/run/
+runs/
