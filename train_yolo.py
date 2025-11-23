@@ -50,7 +50,7 @@ def train_yolo(args):
     # Charger modèle pré-entraîné
     model:YOLO = YOLO('yolov8n.pt')
     
-    device = 'cuda' if torch.cuda.is_available() and args.device != 'cpu' else 'cpu'
+    
     
     # Entraînement
     results = model.train(
@@ -69,8 +69,7 @@ def train_yolo(args):
         verbose=True,
        # cache=args.cache,
         exist_ok=True,
-        patience=5,
-        augment=False  
+        patience=10,
     )
     
     # Validation finale
@@ -89,10 +88,11 @@ def train_yolo(args):
 
 
 def main():
+    device = 'cuda' if torch.cuda.is_available() and args.device != 'cpu' else 'cpu'
     parser = argparse.ArgumentParser(description='CropHealth YOLOv8n Training')
     parser.add_argument('--data', type=str, required=True,
                         help='Path to data.yaml')
-    parser.add_argument('--device', type=str, default='0',
+    parser.add_argument('--device', type=str, default=device,
                         help='CUDA device (0/1/2/3) or cpu')
     parser.add_argument('--cache', action='store_true',
                         help='Cache images in RAM for faster training')
