@@ -4,33 +4,7 @@ Centralise tous les hyperparamètres selon Tableau 6 du rapport
 """
 
 
-CLASS_NAMES = [
-    'A. flava',
-    'Adulte derogata',
-    'B. tabaci',
-    'Coccinelle',
-    'Degat A. flava',
-    'Degat Jassides',
-    'Dysdercus spp',
-    'Earias spp',
-    'Effet phyto',
-    'Fourmie',
-    'G. spodoctera',
-    'H. amirgera',
-    'Jasside',
-    'Larve coccinelle',
-    'Larve syrphe',
-    'P. gossypiella',
-    'Puceron',
-    'S. derogata',
-    'S. frugiperda',
-    'Scarabees',
-    'Syrphe',
-    'punaisse_01',
-    'punaisse_02',
-    'punaisse_03',
-    'punaisse_04'
-]
+CLASS_NAMES = ['A. flava', 'B. tabaci', 'Coccinelle', 'Degat Jassides', 'Dysdercus spp', 'Earias spp', 'Effet phyto', 'G. spodoctera', 'H. amirgera', 'Jasside', 'Larve coccinelle', 'Larve syrphe', 'P. gossypiella', 'Puceron', 'S. derogata', 'S. frugiperda', 'Scarabees']
 
 
 NUM_CLASSES = len(CLASS_NAMES) + 1  # +1 pour background
@@ -40,7 +14,7 @@ MODEL_CONFIGS = {
         'name': 'CropHealth_SSD',
         'backbone': 'MobileNetV3',
         'input_size': 320,
-        'epochs': 50,
+        'epochs': 100,
         'batch_size': 32,
         'lr': 0.005,
         'optimizer': 'SGD',
@@ -53,7 +27,7 @@ MODEL_CONFIGS = {
         'name': 'CropHealth_YOLOv8n',
         'backbone': 'CSP-Darknet',
         'input_size': 640,
-        'epochs': 2,
+        'epochs': 100,
         'batch_size': 32,
         'lr': 0.01,
         'optimizer': 'SGD',
@@ -66,7 +40,7 @@ MODEL_CONFIGS = {
         'name': 'CropHealth_YOLOv11n',
         'backbone': 'CSP-Darknet',
         'input_size': 640,
-        'epochs': 50,
+        'epochs': 100,
         'batch_size': 32,
         'lr': 0.01,
         'optimizer': 'SGD',
@@ -75,25 +49,12 @@ MODEL_CONFIGS = {
         'dataset_format': 'yolo',
         'weights': 'yolo11n.pt',
     },
-    'efficientdet': {
-        'name': 'CropHealth_EfficientDet',
-        'backbone': 'EfficientNet-B0',
-        'input_size': 512,
-        'epochs': 50,
-        'batch_size': 8,
-        'lr': 0.001,
-        'optimizer': 'AdamW',
-        'weight_decay': 1e-4,
-        'scheduler': 'cosine',
-        'dataset_format': 'coco',  # COCO JSON
-        'weights': 'tf_efficientdet_d0',  # via timm
-    },
     'fasterrcnn': {
         'name': 'CropHealth_FasterRCNN',
         'backbone': 'ResNet50+FPN',
         'input_size': 800,
-        'epochs': 12,
-        'batch_size': 4,
+        'epochs': 100,
+        'batch_size': 8,
         'lr': 0.005,
         'optimizer': 'SGD',
         'weight_decay': 1e-4,
@@ -117,23 +78,4 @@ MODEL_CONFIGS = {
 }
 
 
-CLASS_NAMES_update = [
-    'A. flava',
-    'Adulte derogata',
-    'B. tabaci',
-    'Coccinelle',
-    'Degat Jassides',
-    'Dysdercus spp',
-    'Earias spp',
-    'Effet phyto',
-    'G. spodoctera',
-    'H. amirgera',
-    'Jasside',
-    'Larve coccinelle',
-    'Larve syrphe',
-    'P. gossypiella',
-    'Puceron',
-    'S. derogata',
-    'S. frugiperda',
-    'Scarabees'
-]
+CLASS_NAMES_update = CLASS_NAMES
