@@ -81,7 +81,7 @@ def main():
     device =  'cuda' if torch.cuda.is_available() else 'cpu'
     parser = argparse.ArgumentParser(description='CropHealth YOLOv8n/YOLOv11n Training')
     parser.add_argument('--model', type=str, default='yolov8n',
-                        choices=['yolov8n', 'yolov11n'],
+                        choices=['yolov8n', 'yolov11n', 'yolov8m'],
                         help='Model to train')
     parser.add_argument('--data', type=str, required=True,
                         help='Path to data.yaml')

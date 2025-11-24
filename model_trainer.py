@@ -306,9 +306,9 @@ def get_transforms(train=True, image_size=320):
         transform = A.Compose([
             A.Resize(height=image_size, width=image_size),
             A.RandomBrightnessContrast(p=0.3),
-            A.HueSaturationValue(hue_shift_limit=15, sat_shift_limit=70, val_shift_limit=40, p=0.5), 
+            # A.HueSaturationValue(hue_shift_limit=15, sat_shift_limit=70, val_shift_limit=40, p=0.5), 
        
-            A.ShiftScaleRotate(shift_limit=0.1, scale_limit=0.5, rotate_limit=0, p=0.0), # Utilisez p>0 pour rotation/scale
+            #A.ShiftScaleRotate(shift_limit=0.1, scale_limit=0.5, rotate_limit=0, p=0.0), # Utilisez p>0 pour rotation/scale
             A.Normalize(mean=[0.485, 0.456, 0.406],
                        std=[0.229, 0.224, 0.225]),
             ToTensorV2()
