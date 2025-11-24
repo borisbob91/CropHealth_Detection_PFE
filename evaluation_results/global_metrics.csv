@@ -1,0 +1,2 @@
+Model,mAP@50 (%),Precision (%) - Micro,Recall (%) - Micro,F1-Score (%) - Micro
+ssd,45.97,0.39,68.87,0.77

@@ -1,0 +1,69 @@
+Class,Metric,ssd
+class_0,Precision (%),3.39
+class_0,Recall (%),50.00
+class_0,F1-Score (%),6.35
+
+class_1,Precision (%),3.41
+class_1,Recall (%),80.00
+class_1,F1-Score (%),6.54
+
+class_2,Precision (%),1.72
+class_2,Recall (%),84.21
+class_2,F1-Score (%),3.36
+
+class_3,Precision (%),1.62
+class_3,Recall (%),81.19
+class_3,F1-Score (%),3.18
+
+class_4,Precision (%),2.84
+class_4,Recall (%),78.18
+class_4,F1-Score (%),5.49
+
+class_5,Precision (%),2.11
+class_5,Recall (%),89.74
+class_5,F1-Score (%),4.13
+
+class_6,Precision (%),1.72
+class_6,Recall (%),94.09
+class_6,F1-Score (%),3.38
+
+class_7,Precision (%),4.93
+class_7,Recall (%),82.65
+class_7,F1-Score (%),9.30
+
+class_8,Precision (%),2.29
+class_8,Recall (%),89.55
+class_8,F1-Score (%),4.47
+
+class_9,Precision (%),0.20
+class_9,Recall (%),50.64
+class_9,F1-Score (%),0.41
+
+class_10,Precision (%),1.41
+class_10,Recall (%),70.32
+class_10,F1-Score (%),2.76
+
+class_11,Precision (%),2.52
+class_11,Recall (%),68.75
+class_11,F1-Score (%),4.87
+
+class_12,Precision (%),2.04
+class_12,Recall (%),52.29
+class_12,F1-Score (%),3.93
+
+class_13,Precision (%),0.05
+class_13,Recall (%),51.21
+class_13,F1-Score (%),0.11
+
+class_14,Precision (%),0.90
+class_14,Recall (%),81.13
+class_14,F1-Score (%),1.79
+
+class_15,Precision (%),2.35
+class_15,Recall (%),87.33
+class_15,F1-Score (%),4.57
+
+class_16,Precision (%),3.18
+class_16,Recall (%),78.95
+class_16,F1-Score (%),6.11
+
