@@ -27,6 +27,8 @@ def get_albu_transform(model_name: str, train: bool = True, input_size:int=None)
         'efficientdet': 512 if input_size is None else input_size,
         'fasterrcnn': 800 if input_size is None else input_size,
         'fasterrcnn_light': 320 if input_size is None else input_size,
+        'yolov8n': 640 if input_size is None else input_size,
+        'yolov11n': 640 if input_size is None else input_size,
     }
     size = size_map[model_name]
     

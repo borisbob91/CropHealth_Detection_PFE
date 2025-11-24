@@ -55,7 +55,7 @@ def build_model(model_key, checkpoint_path, device):
         raise ValueError(f"Unknown model: {model_key}")
     
     checkpoint = torch.load(checkpoint_path, map_location=device)
-    model.load_state_dict(checkpoint['model'])
+    model.load_state_dict(checkpoint['model_state_dict'])
     model.to(device)
     model.eval()
     
@@ -599,14 +599,14 @@ def evaluate_single_model(model_key, checkpoint_path, val_data, device, class_na
     model = build_model(model_key, checkpoint_path, device)
     config = MODEL_CONFIGS.get(model_key, {'dataset_format': 'yolo'})
     
-    train_loader, val_loader, test_loader = build_dataloaders(model_key,Path(val_data) )
+    train_loader, val_loader, test_loader = build_dataloaders(model_key,Path(val_data), config )
     # Inférence
     print("Running inference...")
     all_preds = []
     all_targets = []
     
     with torch.no_grad():
-        for imgs, targets in val_loader:
+        for imgs, targets in test_loader:
             imgs = list(img.to(device) for img in imgs)
             preds = model(imgs)
             
@@ -644,12 +644,13 @@ def evaluate_single_model(model_key, checkpoint_path, val_data, device, class_na
 
 
 def main(args):
+    from configs.model_configs import CLASS_NAMES 
     device = torch.device(args.device)
     output_dir = Path(args.output)
     output_dir.mkdir(parents=True, exist_ok=True)
     
     # Class names
-    class_names = [f'class_{i}' for i in range(NUM_CLASSES - 1)]
+    class_names = CLASS_NAMES
     
     print(f"\n{'='*60}")
     print(f"🌾 CropHealth Detection - Multi-Model Evaluation")
@@ -710,19 +711,19 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='CropHealth Multi-Model Evaluation')
     parser.add_argument('--checkpoints', type=str, nargs='+', required=True,
-                        help='Model checkpoints: model_key:path (e.g., ssd:runs/SSD/best.pt)')
+                        help='Model checkpoints: model_key=path (e.g., ssd=runs/SSD/best.pt)')
     parser.add_argument('--val-data', type=str, required=True,
                         help='Validation dataset root')
     parser.add_argument('--output', type=str, default='evaluation_results',
                         help='Output directory')
-    parser.add_argument('--device', type=str, default='cuda')
+    parser.add_argument('--device', type=str, default='cpu')
     
     args = parser.parse_args()
     
     # Parse checkpoints
     checkpoints_dict = {}
     for ckpt_str in args.checkpoints:
-        model_key, path = ckpt_str.split(':')
+        model_key, path = ckpt_str.split('=')
         checkpoints_dict[model_key] = path
     
     args.checkpoints = checkpoints_dict

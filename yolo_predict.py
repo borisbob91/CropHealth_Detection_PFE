@@ -179,14 +179,14 @@ if __name__ == '__main__':
     parser.add_argument('--checkpoint', type=str, required=True,
                         help='Path to best.pt (YOLOv8n weights)')
     parser.add_argument('--input', type=str,
-                        help='Input images directory for predictions')
+                        help='Input images directory for predictions', default='evaluations_results')
     parser.add_argument('--output', type=str, default='predictions/yolo',
                         help='Output directory for visualizations')
     parser.add_argument('--data-yaml', type=str,
                         help='Path to data.yaml (for Ultralytics validation)')
     parser.add_argument('--conf', type=float, default=0.5,
                         help='Confidence threshold')
-    parser.add_argument('--device', type=str, default='cuda',
+    parser.add_argument('--device', type=str, default='cpu',
                         help='Device (cuda or cpu)')
     
     args = parser.parse_args()

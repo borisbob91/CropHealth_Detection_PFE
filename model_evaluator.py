@@ -47,7 +47,7 @@ class CropHealthEvaluator:
                  conf_thres: float = 0.25, iou_thres: float = 0.45):
         self.device = torch.device(device if torch.cuda.is_available() else 'cpu')
         self.class_names = class_names
-        self.num_classes = len(class_names) + 1  # + background
+        self.num_classes = len(self.class_names)  # Exclure background
         self.conf_thres = conf_thres
         self.iou_thres = iou_thres
         self.image_size = image_size
@@ -76,7 +76,7 @@ class CropHealthEvaluator:
         print(f"📦 Chargement du modèle depuis {checkpoint_path}...")
         
         #model = build_fasterrcnn_model(num_classes=self.num_classes)
-        model = build_ssd_model(num_classes=self.num_classes)
+        model = build_ssd_model(num_classes=self.num_classes +1)  # +1 pour background
         # model = build_model(self.model_key)
         checkpoint = torch.load(checkpoint_path, map_location=self.device)
         model.load_state_dict(checkpoint['model_state_dict'])
@@ -214,7 +214,7 @@ class CropHealthEvaluator:
         
         metric.reset()
 
-    def _evaluate_torchmetrics(self):
+    def _evaluate_torchmetrics_old(self):
         from torchmetrics.detection import MeanAveragePrecision
         """Fallback torchmetrics"""
         print("\n📈 Phase 2: Évaluation torchmetrics...")
@@ -265,6 +265,75 @@ class CropHealthEvaluator:
             }
         
         metric.reset()
+
+    def _evaluate_torchmetrics(self):
+        from torchmetrics.detection import MeanAveragePrecision
+        """Fallback torchmetrics"""
+        print("\n📈 Phase 2: Évaluation torchmetrics...")
+        
+        # 1. Calculer les métriques GLOBALES
+        metric = MeanAveragePrecision(iou_type='bbox', box_format='xyxy')
+        metric.update(self.all_preds, self.all_targets)
+        map_results = metric.compute()
+        
+        # 2. Enregistrer les scores Globaux
+        self.stats['mAP@50'] = map_results['map_50'].item()
+        self.stats['mAP50-95'] = map_results['map'].item()
+        self.stats['mAP@75'] = map_results['map_75'].item()
+        
+        self.stats['per_class'] = {}
+        
+        # 3. Calculer les métriques PAR CLASSE (une metric par classe)
+        for idx, class_name in enumerate(self.class_names):
+            # Créer une nouvelle instance de metric pour cette classe
+            class_metric = MeanAveragePrecision(
+                iou_type='bbox', 
+                box_format='xyxy',
+                class_metrics=True  # Active les métriques par classe
+            )
+            
+            # Filtrer les prédictions et targets pour cette classe uniquement
+            filtered_preds = []
+            filtered_targets = []
+            
+            for pred, target in zip(self.all_preds, self.all_targets):
+                # Filtrer prédictions
+                mask_pred = pred['labels'] == (idx + 1)
+                filtered_pred = {
+                    'boxes': pred['boxes'][mask_pred],
+                    'scores': pred['scores'][mask_pred],
+                    'labels': pred['labels'][mask_pred],
+                }
+                
+                # Filtrer targets
+                mask_target = target['labels'] == (idx + 1)
+                filtered_target = {
+                    'boxes': target['boxes'][mask_target],
+                    'labels': target['labels'][mask_target],
+                }
+                
+                filtered_preds.append(filtered_pred)
+                filtered_targets.append(filtered_target)
+            
+            # Calculer pour cette classe
+            class_metric.update(filtered_preds, filtered_targets)
+            class_results = class_metric.compute()
+            
+            # Nombre d'instances
+            num_instances = sum((t['labels'] == (idx + 1)).sum().item() for t in self.all_targets)
+            
+            # Enregistrer
+            self.stats['per_class'][class_name] = {
+                'mAP@50': class_results['map_50'].item(),
+                'mAP50-95': class_results['map'].item(),
+                'mAP@75': class_results['map_75'].item(),
+                'num_instances': num_instances
+            }
+            
+            class_metric.reset()
+        
+        metric.reset()
+
     def _compute_sklearn_metrics(self):
         """Calcule Précision, Rappel, F1 avec scikit-learn"""
         print("\n🎯 Phase 3: Métriques scikit-learn...")
@@ -324,7 +393,7 @@ class CropHealthEvaluator:
             report = classification_report(
                 y_true_filtered, 
                 y_pred_filtered, 
-                target_names=self.class_names,
+                target_names=['background'] +self.class_names,  # Exclure background
                 output_dict=True,
                 zero_division=0
             )
@@ -664,9 +733,9 @@ class CropHealthEvaluator:
 def main():
     """Fonction principale d'évaluation"""
     config = {
-        'checkpoint_path': r'C:\Users\BorisBob\Documents\github\CropHealth_Detection_PFE\outputs\ssd_mobilenetv3_1122_2301\best_model.pth',
-        'data_root': Path(r'C:\Users\BorisBob\Desktop\detection\dataset_split\label_studio\pascal_voc\resized_ultimatex4'),
-        'val_dir': 'val',
+        'checkpoint_path': r'C:\Users\BorisBob\Downloads\ssd_mobilenetv3_1123_0902-20251124T015827Z-1-001\ssd_mobilenetv3_1123_0902\best_model.pth',
+        'data_root': Path(r'C:\Users\BorisBob\Desktop\detection\dataset_split\label_studio\pascal_voc_BACKUP_NETTOYAGE_INTELLIGENT'),
+        'val_dir': 'test',
         'class_names': CLASS_NAMES_update,
         'image_size': 320,
     }

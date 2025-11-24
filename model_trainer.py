@@ -61,7 +61,7 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
             'name': 'CropHealth_SSD_SGD',
             'backbone': 'MobileNetV3',
             'num_epochs': 100,
-            'batch_size': 16,
+            'batch_size': 32,
             'learning_rate': 0.01,
             'weight_decay': 0.0005,
             'momentum': 0.9,
@@ -81,7 +81,7 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
             'name': 'CropHealth_FasterRCNN_SGD',
             'backbone': 'ResNet50',
             'num_epochs': 50,
-            'batch_size': 4,
+            'batch_size': 16,
             'learning_rate': 0.001,
             'weight_decay': 0.0005,
             'momentum': 0.9,
@@ -101,7 +101,7 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
             'name': 'CropHealth_FasterRCNN_Light_SGD',
             'backbone': 'MobileNetV3',
             'num_epochs': 100,
-            'batch_size': 6,
+            'batch_size': 32,
             'learning_rate': 0.005,
             'weight_decay': 0.0005,
             'momentum': 0.9,
@@ -126,7 +126,7 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
             'name': 'CropHealth_SSD_AdamW',
             'backbone': 'MobileNetV3',
             'num_epochs': 80,  # Convergence plus rapide avec Adam
-            'batch_size': 10,  # Batch légèrement plus grand
+            'batch_size': 32,  # Batch légèrement plus grand
             'learning_rate': 0.0005,  # LR beaucoup plus bas pour Adam
             'weight_decay': 0.01,  # Weight decay plus élevé pour AdamW
             'momentum': None,  # Pas de momentum avec Adam
@@ -149,7 +149,7 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
             'name': 'CropHealth_FasterRCNN_AdamW',
             'backbone': 'ResNet50',
             'num_epochs': 50,  # Légèrement plus d'epochs
-            'batch_size': 5,  # Batch légèrement augmenté
+            'batch_size': 32,  # Batch légèrement augmenté
             'learning_rate': 0.0001,  # LR réduit pour Adam
             'weight_decay': 0.01,
             'momentum': None,
@@ -171,7 +171,7 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
             'name': 'CropHealth_FasterRCNN_Light_AdamW',
             'backbone': 'MobileNetV3',
             'num_epochs': 40,  # Plus d'epochs pour compenser
-            'batch_size': 8,  # Batch augmenté
+            'batch_size': 32,  # Batch augmenté
             'learning_rate': 0.0003,  # LR intermédiaire
             'weight_decay': 0.01,
             'momentum': None,
