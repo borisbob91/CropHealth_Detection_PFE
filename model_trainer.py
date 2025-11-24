@@ -81,7 +81,7 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
             'name': 'CropHealth_FasterRCNN_SGD',
             'backbone': 'ResNet50',
             'num_epochs': 50,
-            'batch_size': 16,
+            'batch_size': 32,
             'learning_rate': 0.001,
             'weight_decay': 0.0005,
             'momentum': 0.9,
