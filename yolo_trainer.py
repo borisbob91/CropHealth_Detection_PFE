@@ -59,7 +59,7 @@ def train_yolo(args):
         verbose=True,
         cache=args.cache,
         exist_ok=True,
-        patience=10,
+        patience=5,
     )
     
     # Validation finale
