@@ -94,11 +94,11 @@ def build_dataloaders(model_key, data_root, config):
         test_lbls = str(Path(data_root) / 'test' / 'labels')
 
         train_ds = YoloDataset(train_imgs, train_lbls, 
-                               get_albu_transform(model_key, train=True))
+                               get_albu_transform(model_key, train=True, input_size=input_size))
         val_ds = YoloDataset(val_imgs, val_lbls, 
-                             get_albu_transform(model_key, train=False))
+                             get_albu_transform(model_key, train=False, input_size=input_size))
         test_ds = YoloDataset(test_imgs, test_lbls, 
-                              get_albu_transform(model_key, train=False))
+                              get_albu_transform(model_key, train=False, input_size=input_size))
     
     elif dataset_format == 'coco':
         # COCO JSON format

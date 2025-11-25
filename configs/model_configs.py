@@ -78,7 +78,7 @@ MODEL_CONFIGS = {
     'fasterrcnn_light': {
         'name': 'CropHealth_FasterRCNN_light',
         'backbone': 'MobileNetV3+FPN',
-        'input_size': 320,
+        'input_size': 600,
         'epochs': 20,
         'batch_size': 16,
         'lr': 0.005,
