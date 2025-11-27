@@ -68,7 +68,7 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
             'image_size': 640,
             'input_size': 640,
             'dataset_format': 'yolo',
-            'save_dir': Path(f"runs/{data_type}/ssd_mobilenetv3_sgd_{timestamp}"),
+            'save_dir': Path(f"runs/{data_type}/ssd_mobilenetv3_sgd_{timestamp}_final"),
             'optimizer_type': 'sgd',
             'scheduler_type': 'cosine',
             'scheduler_params': {
@@ -88,7 +88,7 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
             'image_size': 800,
             'input_size': 800,
             'dataset_format': 'yolo',
-            'save_dir': Path(f"runs/{data_type}/faster_rcnn_sgd_{timestamp}"),
+            'save_dir': Path(f"runs/{data_type}/faster_rcnn_sgd_{timestamp}_final"),
             'optimizer_type': 'sgd',
             'scheduler_type': 'step',
             'scheduler_params': {
@@ -108,7 +108,7 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
             'image_size': 640,
             'input_size': 640,
             'dataset_format': 'yolo',
-            'save_dir': Path(f"runs/{data_type}/faster_rcnn_light_sgd_{timestamp}"),
+            'save_dir': Path(f"runs/{data_type}/faster_rcnn_light_sgd_{timestamp}_final"),
             'optimizer_type': 'sgd',
             'scheduler_type': 'step',
             'scheduler_params': {
@@ -133,7 +133,7 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
             'image_size': 320,
             'input_size': 320,
             'dataset_format': 'yolo',
-            'save_dir': Path(f"runs/{data_type}/ssd_mobilenetv3_adamw_{timestamp}"),
+            'save_dir': Path(f"runs/{data_type}/ssd_mobilenetv3_adamw_{timestamp}_final"),
             'optimizer_type': 'adamw',
             'scheduler_type': 'cosine',
             'scheduler_params': {
@@ -156,7 +156,7 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
             'image_size': 800,
             'input_size': 800,
             'dataset_format': 'yolo',
-            'save_dir': Path(f"runs/{data_type}/faster_rcnn_adamw_{timestamp}"),
+            'save_dir': Path(f"runs/{data_type}/faster_rcnn_adamw_{timestamp}_final"),
             'optimizer_type': 'adamw',
             'scheduler_type': 'cosine',  # Cosine au lieu de Step
             'scheduler_params': {
@@ -178,7 +178,7 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
             'image_size': 640,
             'input_size': 640,
             'dataset_format': 'yolo',
-            'save_dir': Path(f"runs/{data_type}/faster_rcnn_light_adamw_{timestamp}"),
+            'save_dir': Path(f"runs/{data_type}/faster_rcnn_light_adamw_{timestamp}_final"),
             'optimizer_type': 'adamw',
             'scheduler_type': 'cosine',
             'scheduler_params': {
