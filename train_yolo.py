@@ -59,8 +59,8 @@ def train_yolo(args):
         imgsz=config['input_size'],
         batch=config['batch_size'],
         lr0=config['lr'],
-        weight_decay=config['weight_decay'],
-        optimizer=config['optimizer'],
+        #weight_decay=config['weight_decay'],
+        #optimizer=config['optimizer'],
         cos_lr=True,  # Cosine scheduler
         project='runs',
         name=run_name,
