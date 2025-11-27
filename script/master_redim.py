@@ -10,15 +10,15 @@ from functools import partial
 import shutil
 
 class UltimateSmartResizer:
-    def __init__(self, large_threshold: int = 1000):
+    def __init__(self, large_threshold: int = 1000, target_size = (800, 800)):
         self.large_threshold = large_threshold
-        self.target_size = (800, 800)
+        self.target_size = target_size
 
     def _get_centroids(self, bboxes):
         """Calcule les centroïdes des bounding boxes"""
         return np.array([((x1 + x2) / 2, (y1 + y2) / 2) for x1, y1, x2, y2 in bboxes])
 
-    def _detect_clusters(self, bboxes, image_shape, min_ratio=0.25):
+    def _detect_clusters(self, bboxes, image_shape, min_ratio=0.10):
         """Détecte si les objets sont en clusters séparés"""
         if len(bboxes) < 2:
             return None
@@ -47,7 +47,7 @@ class UltimateSmartResizer:
 
         transform = A.Compose([
             A.Crop(x_min=x1, y_min=y1, x_max=x2, y_max=y2),
-            A.Resize(height=800, width=800)
+            A.Resize(height=self.target_size[1], width=self.target_size[0])
         ], bbox_params=A.BboxParams(format='pascal_voc', min_visibility=0.3, label_fields=['labels']))
 
         try:
@@ -64,8 +64,9 @@ class UltimateSmartResizer:
         h, w = image.shape[:2]
         
         transform = A.Compose([
-            A.Resize(height=800, width=800)
-        ], bbox_params=A.BboxParams(format='pascal_voc', min_visibility=0.3, label_fields=['labels']))
+            A.CenterCrop(height=self.target_size[1], width=self.target_size[0], p=0.5),
+            # A.Resize(height=self.target_size[1], width=self.target_size[0]),
+        ], bbox_params=A.BboxParams(format='pascal_voc', min_visibility=0.5, label_fields=['labels']))
         
         try:
             transformed = transform(image=image, bboxes=bboxes, labels=labels)
@@ -266,9 +267,9 @@ def resize_entire_dataset(root_dataset_path: str, num_workers: int = 4):
         root_dataset_path: Chemin racine du dataset
         num_workers: Nombre de workers CPU (par défaut 4)
     """
-    resizer = UltimateSmartResizer(large_threshold=1000)
+    resizer = UltimateSmartResizer(large_threshold=900, target_size=(640, 640))
 
-    output_root = os.path.join(root_dataset_path, "resized_ultimatex4")
+    output_root = os.path.join(root_dataset_path, "resized_ultimatex4_640")
     splits = ['train', 'val', 'test']
 
     total_in, total_out = 0, 0
@@ -333,7 +334,7 @@ def resize_entire_dataset(root_dataset_path: str, num_workers: int = 4):
 # ======================== LANCE ÇA ========================
 if __name__ == "__main__":
     # METS JUSTE TON DOSSIER RACINE ICI
-    root = r"C:\Users\BorisBob\Desktop\detection\dataset_split\label_studio\pascal_voc"
+    root = r"C:\Users\BorisBob\Desktop\detection\dataset_split\label_studio\pascal_voc_BACKUP_NETTOYAGE_INTELLIGENT"
     
     # Lance avec 4 workers (ou change le nombre si tu veux)
     resize_entire_dataset(root, num_workers=4)

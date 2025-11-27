@@ -23,10 +23,10 @@ def get_albu_transform(model_name: str, train: bool = True, input_size:int=None)
     """
     # Taille d'entrée selon Tableau 6
     size_map = {
-        'ssd': 320 if input_size is None else input_size,
+        'ssd': 600 if input_size is None else input_size,
         'efficientdet': 512 if input_size is None else input_size,
         'fasterrcnn': 800 if input_size is None else input_size,
-        'fasterrcnn_light': 320 if input_size is None else input_size,
+        'fasterrcnn_light': 600 if input_size is None else input_size,
         'yolov8n': 640 if input_size is None else input_size,
         'yolov11n': 640 if input_size is None else input_size,
     }

@@ -48,9 +48,9 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
         'train_dir': 'train',
         'val_dir': 'val',
         'test_dir': 'test',
-        'early_stopping_patience': 10,
+        'early_stopping_patience': 5,
         'early_stopping_min_delta': 0.001,
-        'save_every': 5,
+        'save_every': 1,
     }
     
     # ═══════════════════════════════════════════════════════════════════
@@ -60,29 +60,29 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
         'ssd': {
             'name': 'CropHealth_SSD_SGD',
             'backbone': 'MobileNetV3',
-            'num_epochs': 100,
+            'num_epochs': 20,
             'batch_size': 32,
             'learning_rate': 0.01,
             'weight_decay': 0.0005,
             'momentum': 0.9,
-            'image_size': 320,
-            'input_size': 320,
+            'image_size': 640,
+            'input_size': 640,
             'dataset_format': 'yolo',
             'save_dir': Path(f"runs/{data_type}/ssd_mobilenetv3_sgd_{timestamp}"),
             'optimizer_type': 'sgd',
             'scheduler_type': 'cosine',
             'scheduler_params': {
-                'T_max': 100,
+                'T_max': 20,
                 'eta_min': 1e-6
             }
         },
         
         'frcnn': {
-            'name': 'CropHealth_FasterRCNN_SGD',
+            'name': 'CropHealth_FasterRCNN50_SGD',
             'backbone': 'ResNet50',
             'num_epochs': 50,
             'batch_size': 32,
-            'learning_rate': 0.001,
+            'learning_rate': 0.01,
             'weight_decay': 0.0005,
             'momentum': 0.9,
             'image_size': 800,
@@ -100,13 +100,13 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
         'frcnn_light': {
             'name': 'CropHealth_FasterRCNN_Light_SGD',
             'backbone': 'MobileNetV3',
-            'num_epochs': 100,
+            'num_epochs': 20,
             'batch_size': 32,
-            'learning_rate': 0.005,
+            'learning_rate': 0.01,
             'weight_decay': 0.0005,
             'momentum': 0.9,
-            'image_size': 320,
-            'input_size': 320,
+            'image_size': 640,
+            'input_size': 640,
             'dataset_format': 'yolo',
             'save_dir': Path(f"runs/{data_type}/faster_rcnn_light_sgd_{timestamp}"),
             'optimizer_type': 'sgd',
@@ -125,7 +125,7 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
         'ssd': {
             'name': 'CropHealth_SSD_AdamW',
             'backbone': 'MobileNetV3',
-            'num_epochs': 80,  # Convergence plus rapide avec Adam
+            'num_epochs': 20,  # Convergence plus rapide avec Adam
             'batch_size': 32,  # Batch légèrement plus grand
             'learning_rate': 0.0005,  # LR beaucoup plus bas pour Adam
             'weight_decay': 0.01,  # Weight decay plus élevé pour AdamW
@@ -148,7 +148,7 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
         'frcnn': {
             'name': 'CropHealth_FasterRCNN_AdamW',
             'backbone': 'ResNet50',
-            'num_epochs': 50,  # Légèrement plus d'epochs
+            'num_epochs': 20,  # Légèrement plus d'epochs
             'batch_size': 32,  # Batch légèrement augmenté
             'learning_rate': 0.0001,  # LR réduit pour Adam
             'weight_decay': 0.01,
@@ -170,13 +170,13 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
         'frcnn_light': {
             'name': 'CropHealth_FasterRCNN_Light_AdamW',
             'backbone': 'MobileNetV3',
-            'num_epochs': 40,  # Plus d'epochs pour compenser
+            'num_epochs': 20,  # Plus d'epochs pour compenser
             'batch_size': 32,  # Batch augmenté
             'learning_rate': 0.0003,  # LR intermédiaire
             'weight_decay': 0.01,
             'momentum': None,
-            'image_size': 320,
-            'input_size': 320,
+            'image_size': 640,
+            'input_size': 640,
             'dataset_format': 'yolo',
             'save_dir': Path(f"runs/{data_type}/faster_rcnn_light_adamw_{timestamp}"),
             'optimizer_type': 'adamw',

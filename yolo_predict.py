@@ -170,7 +170,7 @@ def main(args):
         print(f"  GFLOPs:       {metrics['gflops']:.2f}")
         print(f"  Total Params: {metrics['total_params']:,}")
         # Sauvegarder CSV
-        csv_path = Path(args.output) / 'yolo_metrics.csv'
+        csv_path = Path(args.output) / 'yolo_metrics_best_model.csv'
         save_metrics_csv(metrics, csv_path)
 
 

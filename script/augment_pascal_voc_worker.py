@@ -18,9 +18,9 @@ from functools import partial
 
 # Nombre d'augmentations par niveau (modifiable)
 AUGMENTATION_COUNTS = {
-    'low': 13,    # Classes rares → max de diversité
-    'medium': 7, # Classes modérées → équilibre
-    'high': 5    # Classes fréquentes → minimum suffisant
+    'low': 10,    # Classes rares → max de diversité
+    'medium': 3, # Classes modérées → équilibre
+    'high': 2    # Classes fréquentes → minimum suffisant
 }
 
 # Seuils de classification des classes
@@ -98,10 +98,6 @@ def get_transforms(dataset_type: str, bbox_format: str = 'pascal_voc') -> Dict[s
             'transform': A.Compose([A.Rotate(limit=(180, 180), p=1.0, border_mode=cv2.BORDER_CONSTANT)], bbox_params=bbox_params),
             'train': True, 'val': True, 'test': True
         },
-        'scale': {
-            'transform': A.Compose([A.Affine(scale=1.2, p=1.0)], bbox_params=bbox_params),
-            'train': True, 'val': True, 'test': True
-        },
         'gamma': {
             'transform': A.Compose([A.RandomGamma(gamma_limit=(150, 200), p=1.0)], bbox_params=bbox_params),
             'train': True, 'val': False, 'test': False
@@ -112,10 +108,7 @@ def get_transforms(dataset_type: str, bbox_format: str = 'pascal_voc') -> Dict[s
             ], bbox_params=bbox_params),
             'train': True, 'val': False, 'test': False
         },
-           'weather_fog': {
-            'transform': A.Compose([A.RandomFog(fog_coef_range=(0.3, 1), p=1.0)], bbox_params=bbox_params),
-            'train': True, 'val': False, 'test': False
-        },
+       
         'color_hue': {
             'transform': A.Compose([A.HueSaturationValue(hue_shift_limit=20, p=1.0)], bbox_params=bbox_params),
             'train': True, 'val': False, 'test': False
@@ -124,18 +117,6 @@ def get_transforms(dataset_type: str, bbox_format: str = 'pascal_voc') -> Dict[s
             'transform': A.Compose([A.HueSaturationValue(sat_shift_limit=(-30, 30), p=1.0)], bbox_params=bbox_params),
             'train': True, 'val': False, 'test': False
         },
-        'noise_gauss': {
-        'transform': A.Compose([A.GaussNoise(var_limit=(10.0, 50.0), p=1.0)], bbox_params=bbox_params),
-        'train': True, 'val': False, 'test': False
-    },
-    'shift_scl_rot': {
-    'transform': A.Compose([A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.1, rotate_limit=15, p=1.0, border_mode=cv2.BORDER_CONSTANT)], bbox_params=bbox_params),
-    'train': True, 'val': False, 'test': False
-    },
-    'blur_gaussian': {
-        'transform': A.Compose([A.GaussianBlur(blur_limit=(3, 7), p=1.0)], bbox_params=bbox_params),
-        'train': True, 'val': False, 'test': False
-    },
     }
 
     # === Filtrage selon le dataset_type ===

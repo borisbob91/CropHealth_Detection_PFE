@@ -47,14 +47,14 @@ def get_config():
         'momentum': 0.9,
         
         # Early stopping
-        'early_stopping_patience': 10,  # epochs sans amélioration
+        'early_stopping_patience': 5,  # epochs sans amélioration
         'early_stopping_min_delta': 0.001,
         
         # Transformations
-        'image_size': 320,  # Taille SSD
+        'image_size': 640,  # Taille SSD
         'name': 'CropHealth_SSD',
         'backbone': 'MobileNetV3',
-        'input_size': 320,
+        'input_size': 640,
         # Sauvegarde
         'save_dir': Path(f"runs/ssd_mobilenetv3_{timestamp}"),
         'save_every': 5,

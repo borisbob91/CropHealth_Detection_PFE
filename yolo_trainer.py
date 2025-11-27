@@ -63,11 +63,11 @@ def train_yolo(args):
     )
     
     # Validation finale
-    if not args.no_val:
-        print("\n>>> Final validation...")
-        metrics = model.val()
-        print(f"✅ mAP@50-95: {metrics.box.map:.4f}")
-        print(f"✅ mAP@50: {metrics.box.map50:.4f}")
+    
+    print("\n>>> Final validation...")
+    metrics = model.val()
+    print(f"✅ mAP@50-95: {metrics.box.map:.4f}")
+    print(f"✅ mAP@50: {metrics.box.map50:.4f}")
     
     save_dir = Path(results.save_dir)
     print(f"\n✅ Training complete!")
