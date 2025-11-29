@@ -59,3 +59,5 @@ class YOLOv8Wrapper:
                 })
         
         return predictions
+    def train(self):
+        return self.__call__()  # Pas de mode entraînement pour l'instant

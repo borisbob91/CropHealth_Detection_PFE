@@ -13,7 +13,7 @@ MODEL_CONFIGS = {
     'ssd': {
         'name': 'CropHealth_SSD',
         'backbone': 'MobileNetV3',
-        'input_size': 640,
+        'input_size': 320,
         'epochs': 20,
         'batch_size': 32,
         'lr': 0.01,
@@ -78,7 +78,7 @@ MODEL_CONFIGS = {
     'fasterrcnn_light': {
         'name': 'CropHealth_FasterRCNN_light',
         'backbone': 'MobileNetV3+FPN',
-        'input_size': 640,
+        'input_size': 320,
         'epochs': 20,
         'batch_size': 16,
         'lr': 0.01,

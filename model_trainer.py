@@ -49,7 +49,7 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
         'val_dir': 'val',
         'test_dir': 'test',
         'early_stopping_patience': 5,
-        'early_stopping_min_delta': 0.001,
+        'early_stopping_min_delta': 0.01,
         'save_every': 1,
     }
     
@@ -65,8 +65,8 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
             'learning_rate': 0.01,
             'weight_decay': 0.0005,
             'momentum': 0.9,
-            'image_size': 640,
-            'input_size': 640,
+            'image_size': 320,
+            'input_size': 320,
             'dataset_format': 'yolo',
             'save_dir': Path(f"runs/{data_type}/ssd_mobilenetv3_sgd_{timestamp}_final"),
             'optimizer_type': 'sgd',
@@ -81,7 +81,7 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
             'name': 'CropHealth_FasterRCNN50_SGD',
             'backbone': 'ResNet50',
             'num_epochs': 20,
-            'batch_size': 32,
+            'batch_size': 16,
             'learning_rate': 0.01,
             'weight_decay': 0.0005,
             'momentum': 0.9,
@@ -105,8 +105,8 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
             'learning_rate': 0.01,
             'weight_decay': 0.0005,
             'momentum': 0.9,
-            'image_size': 640,
-            'input_size': 640,
+            'image_size': 320,
+            'input_size': 320,
             'dataset_format': 'yolo',
             'save_dir': Path(f"runs/{data_type}/faster_rcnn_light_sgd_{timestamp}_final"),
             'optimizer_type': 'sgd',
@@ -149,7 +149,7 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
             'name': 'CropHealth_FasterRCNN_AdamW',
             'backbone': 'ResNet50',
             'num_epochs': 20,  # Légèrement plus d'epochs
-            'batch_size': 32,  # Batch légèrement augmenté
+            'batch_size': 16,  # Batch légèrement augmenté
             'learning_rate': 0.0001,  # LR réduit pour Adam
             'weight_decay': 0.01,
             'momentum': None,
@@ -175,8 +175,8 @@ def get_model_config(model_type='ssd', use_adam=False, data_type = 'augmented'):
             'learning_rate': 0.0003,  # LR intermédiaire
             'weight_decay': 0.01,
             'momentum': None,
-            'image_size': 640,
-            'input_size': 640,
+            'image_size': 320,
+            'input_size': 320,
             'dataset_format': 'yolo',
             'save_dir': Path(f"runs/{data_type}/faster_rcnn_light_adamw_{timestamp}_final"),
             'optimizer_type': 'adamw',
