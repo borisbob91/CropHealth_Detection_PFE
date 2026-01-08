@@ -1,0 +1,10 @@
+Métrique,Rôle,Valeur,Unité,Outil
+mAP@50,Principal,87.92,%,Ultralytics
+mAP@50-95,Secondaire,49.20,%,Ultralytics
+mAP@75,Secondaire,48.08,%,Ultralytics
+Precision,Analyse FP/FN,87.07,%,Ultralytics
+Recall,Analyse FP/FN,87.75,%,Ultralytics
+F1-Score,Analyse FP/FN,87.41,%,Calculé (2PR/(P+R))
+FPS,Temps-réel,7.02,img/s,time.perf_counter()
+Taille,Edge,19.28,MB,torchinfo
+GFLOPs,Edge,4.05,GFLOP,thop

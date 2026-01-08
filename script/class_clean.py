@@ -107,7 +107,7 @@ def supprimer_classes_intelligente(
 
 # ======================== À LANCER ========================
 if __name__ == "__main__":
-    dataset_root = r"C:\Users\BorisBob\Desktop\detection\dataset_split\label_studio\pascal_voc"
+    dataset_root = r"C:\Users\BorisBob\Desktop\detection\dataset_split\label_studio\state"
 
     classes_a_virer = [
         'Fourmie',
@@ -122,5 +122,5 @@ if __name__ == "__main__":
     supprimer_classes_intelligente(
         root_path=dataset_root,
         classes_a_supprimer=classes_a_virer,
-        backup=True
+        backup=False
     )

@@ -1,18 +1,18 @@
-Class,ssd
-class_0,33.84
-class_1,45.02
-class_2,47.23
-class_3,42.41
-class_4,60.52
-class_5,65.56
-class_6,59.42
-class_7,70.02
-class_8,62.68
-class_9,9.46
-class_10,39.69
-class_11,45.69
-class_12,21.93
-class_13,11.93
-class_14,53.93
-class_15,57.54
-class_16,54.61
+Class,ssd,yolov8n
+A. flava,99.30,0.00
+B. tabaci,97.91,0.00
+Coccinelle,66.40,0.00
+Degat Jassides,83.37,0.00
+Dysdercus spp,94.46,0.00
+Earias spp,95.64,0.00
+Effet phyto,80.64,0.00
+G. spodoctera,100.00,0.00
+H. amirgera,87.81,0.00
+Jasside,15.14,0.00
+Larve coccinelle,50.81,0.00
+Larve syrphe,95.64,0.00
+P. gossypiella,61.03,0.00
+Puceron,5.88,0.00
+S. derogata,94.27,0.00
+S. frugiperda,91.92,0.00
+Scarabees,99.96,0.00

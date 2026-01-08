@@ -25,14 +25,15 @@ from datasets.pascalvoc_dataset import PascalVOCDataset
 from thop import profile
 from torchinfo import summary
 
-from .configs.model_configs import MODEL_CONFIGS, NUM_CLASSES
-from .datasets.yolo_dataset import YoloDataset
-from .datasets.coco_dataset import CocoDataset
-from .datasets.transforms import get_albu_transform
-from .models.ssd_model import build_ssd_model
-from .models.effdet_model import build_efficientdet_model
-from .models.frcnn_model import build_fasterrcnn_model
-from .models.frcnn_light_model import build_fasterrcnn_light_model
+from configs.model_configs import MODEL_CONFIGS, NUM_CLASSES
+from datasets.yolo_dataset import YoloDataset
+from datasets.coco_dataset import CocoDataset
+from datasets.transforms import get_albu_transform
+from models.ssd_model import build_ssd_model
+from models.effdet_model import build_efficientdet_model
+from models.frcnn_model import build_fasterrcnn_model
+from models.frcnn_light_model import build_fasterrcnn_light_model
+from prepare_faster_light import get_transforms
 
 
 def build_model(model_key, checkpoint_path, device):
@@ -49,7 +50,8 @@ def build_model(model_key, checkpoint_path, device):
         raise ValueError(f"Unknown model: {model_key}")
     
     checkpoint = torch.load(checkpoint_path, map_location=device)
-    model.load_state_dict(checkpoint['model'])
+    model.load_state_dict(checkpoint['model_state_dict'])
+    print(checkpoint.keys())
     model.to(device)
     model.eval()
     
@@ -231,7 +233,8 @@ def predict_and_save(model, input_dir, output_dir, model_key, device, conf_thres
     
     print(f"\n🔍 Running predictions on {len(img_paths)} images...")
     
-    transform = get_albu_transform(model_key, train=False)
+    # transform = get_albu_transform(model_key, train=False, input_size=320)
+    transform= get_transforms(train=False)
     
     with torch.no_grad():
         for img_path in img_paths:
@@ -346,7 +349,7 @@ if __name__ == '__main__':
                         help='Validation dataset root (for COCO metrics)')
     parser.add_argument('--conf', type=float, default=0.5,
                         help='Confidence threshold for visualization')
-    parser.add_argument('--device', type=str, default='cuda')
+    parser.add_argument('--device', type=str, default='cpu')
     
     args = parser.parse_args()
     main(args)

@@ -127,7 +127,7 @@ class DatasetAnalyzer:
 if __name__ == "__main__":
     analyzer = DatasetAnalyzer()
 
-    root = r'C:\Users\BorisBob\Desktop\detection\models\yolov8n_orignal_and_augmented_train\CropHealth_YOLOv8n_1123_1009\weights\best.pt'
+    root = r'C:\Users\BorisBob\Desktop\detection\dataset_split\label_studio\state'
 
     df_img, df_inst = analyzer.analyze_full_dataset(root, "crop_health_ac")
 

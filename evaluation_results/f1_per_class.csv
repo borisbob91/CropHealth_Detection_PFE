@@ -1,69 +1,69 @@
-Class,Metric,ssd
-class_0,Precision (%),3.39
-class_0,Recall (%),50.00
-class_0,F1-Score (%),6.35
+Class,Metric,ssd,yolov8n
+A. flava,Precision (%),3.03,0.00
+A. flava,Recall (%),100.00,0.00
+A. flava,F1-Score (%),5.88,0.00
 
-class_1,Precision (%),3.41
-class_1,Recall (%),80.00
-class_1,F1-Score (%),6.54
+B. tabaci,Precision (%),4.33,0.00
+B. tabaci,Recall (%),100.00,0.00
+B. tabaci,F1-Score (%),8.30,0.00
 
-class_2,Precision (%),1.72
-class_2,Recall (%),84.21
-class_2,F1-Score (%),3.36
+Coccinelle,Precision (%),3.08,0.00
+Coccinelle,Recall (%),90.00,0.00
+Coccinelle,F1-Score (%),5.95,0.00
 
-class_3,Precision (%),1.62
-class_3,Recall (%),81.19
-class_3,F1-Score (%),3.18
+Degat Jassides,Precision (%),1.14,0.00
+Degat Jassides,Recall (%),99.47,0.00
+Degat Jassides,F1-Score (%),2.25,0.00
 
-class_4,Precision (%),2.84
-class_4,Recall (%),78.18
-class_4,F1-Score (%),5.49
+Dysdercus spp,Precision (%),2.96,0.00
+Dysdercus spp,Recall (%),100.00,0.00
+Dysdercus spp,F1-Score (%),5.74,0.00
 
-class_5,Precision (%),2.11
-class_5,Recall (%),89.74
-class_5,F1-Score (%),4.13
+Earias spp,Precision (%),2.47,0.00
+Earias spp,Recall (%),100.00,0.00
+Earias spp,F1-Score (%),4.81,0.00
 
-class_6,Precision (%),1.72
-class_6,Recall (%),94.09
-class_6,F1-Score (%),3.38
+Effet phyto,Precision (%),1.73,0.00
+Effet phyto,Recall (%),98.48,0.00
+Effet phyto,F1-Score (%),3.41,0.00
 
-class_7,Precision (%),4.93
-class_7,Recall (%),82.65
-class_7,F1-Score (%),9.30
+G. spodoctera,Precision (%),4.46,0.00
+G. spodoctera,Recall (%),100.00,0.00
+G. spodoctera,F1-Score (%),8.55,0.00
 
-class_8,Precision (%),2.29
-class_8,Recall (%),89.55
-class_8,F1-Score (%),4.47
+H. amirgera,Precision (%),2.05,0.00
+H. amirgera,Recall (%),100.00,0.00
+H. amirgera,F1-Score (%),4.01,0.00
 
-class_9,Precision (%),0.20
-class_9,Recall (%),50.64
-class_9,F1-Score (%),0.41
+Jasside,Precision (%),0.17,0.00
+Jasside,Recall (%),47.57,0.00
+Jasside,F1-Score (%),0.33,0.00
 
-class_10,Precision (%),1.41
-class_10,Recall (%),70.32
-class_10,F1-Score (%),2.76
+Larve coccinelle,Precision (%),1.37,0.00
+Larve coccinelle,Recall (%),76.79,0.00
+Larve coccinelle,F1-Score (%),2.68,0.00
 
-class_11,Precision (%),2.52
-class_11,Recall (%),68.75
-class_11,F1-Score (%),4.87
+Larve syrphe,Precision (%),2.87,0.00
+Larve syrphe,Recall (%),97.62,0.00
+Larve syrphe,F1-Score (%),5.58,0.00
 
-class_12,Precision (%),2.04
-class_12,Recall (%),52.29
-class_12,F1-Score (%),3.93
+P. gossypiella,Precision (%),2.08,0.00
+P. gossypiella,Recall (%),89.29,0.00
+P. gossypiella,F1-Score (%),4.06,0.00
 
-class_13,Precision (%),0.05
-class_13,Recall (%),51.21
-class_13,F1-Score (%),0.11
+Puceron,Precision (%),0.10,0.00
+Puceron,Recall (%),49.50,0.00
+Puceron,F1-Score (%),0.20,0.00
 
-class_14,Precision (%),0.90
-class_14,Recall (%),81.13
-class_14,F1-Score (%),1.79
+S. derogata,Precision (%),0.90,0.00
+S. derogata,Recall (%),100.00,0.00
+S. derogata,F1-Score (%),1.79,0.00
 
-class_15,Precision (%),2.35
-class_15,Recall (%),87.33
-class_15,F1-Score (%),4.57
+S. frugiperda,Precision (%),2.04,0.00
+S. frugiperda,Recall (%),98.52,0.00
+S. frugiperda,F1-Score (%),4.00,0.00
 
-class_16,Precision (%),3.18
-class_16,Recall (%),78.95
-class_16,F1-Score (%),6.11
+Scarabees,Precision (%),3.18,0.00
+Scarabees,Recall (%),100.00,0.00
+Scarabees,F1-Score (%),6.16,0.00
 

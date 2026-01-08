@@ -4,7 +4,7 @@ Centralise tous les hyperparamètres selon Tableau 6 du rapport
 """
 
 
-CLASS_NAMES = ['A. flava', 'B. tabaci', 'Coccinelle', 'Degat Jassides', 'Dysdercus spp', 'Earias spp', 'Effet phyto', 'G. spodoctera', 'H. amirgera', 'Jasside', 'Larve coccinelle', 'Larve syrphe', 'P. gossypiella', 'Puceron', 'S. derogata', 'S. frugiperda', 'Scarabees']
+CLASS_NAMES = ['A. flava', 'B. tabaci', 'Coccinelle', 'Degat Jassides', 'Dysdercus spp', 'Earias spp', 'Effet phyto', 'G. spodoptera', 'H. amirgera', 'Jasside', 'Larve coccinelle', 'Larve syrphe', 'P. gossypiella', 'Puceron', 'S. derogata', 'S. frugiperda', 'Scarabees']
 
 
 NUM_CLASSES = len(CLASS_NAMES) + 1  # +1 pour background
